@@ -286,7 +286,8 @@ function downloadIcs(el) {
 /**
  * Móvil: acción directa, la que mejor funciona en cada sistema.
  * - Android: formulario de Google Calendar (su app no importa .ics).
- * - iOS: se navega al .ics sin descargarlo → hoja del sistema «Añadir al calendario».
+ * - iOS: se navega a un .ics publicado (data-ics-file), sin `download` → Safari muestra
+ *   «Añadir al calendario». Safari no lo hace con un .ics generado al vuelo (data:/blob:).
  * @returns {boolean} false en escritorio: ahí el usuario elige en un menú (links())
  */
 function addDirect(el) {
@@ -298,7 +299,12 @@ function addDirect(el) {
     return true;
   }
   if (target === 'ios') {
-    window.location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(buildIcs(ev))}`;
+    const file = el.getAttribute('data-ics-file');
+    if (file) {
+      window.location.href = new URL(file, window.location.href).href;
+    } else {
+      window.open(googleUrl(ev), '_blank', 'noopener'); // sin archivo publicado
+    }
     return true;
   }
   return false;

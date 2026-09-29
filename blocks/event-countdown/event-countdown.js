@@ -47,6 +47,9 @@ function buildCalButton(cfg, target) {
   });
   // Sin fila «ICS Start», el evento empieza en la fecha de la cuenta atrás
   if (!cal.hasAttribute('data-ics-start') && target) cal.setAttribute('data-ics-start', target);
+  // iPhone: .ics publicado (Safari solo ofrece «Añadir al calendario» con un archivo real).
+  // Fila opcional «ICS File»; si no, el del repo. Sus datos deben coincidir con las filas ICS.
+  cal.setAttribute('data-ics-file', cfg['ics-file'] || `${window.hlx.codeBasePath}/calendar/nfl-madrid-game.ics`);
   if (cfg['ics-allday']) cal.setAttribute('data-ics-allday', '');
   const hidden = document.createElement('span');
   hidden.className = 'visually-hidden';
