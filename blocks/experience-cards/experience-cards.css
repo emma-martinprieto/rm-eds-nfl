@@ -1,0 +1,312 @@
+/* 04 · Experiencias Madridista — literal port of prototype styles.css L922-1238.
+   The section colours (.experiences L924-932) come from section-metadata `Style: dark`
+   (styles.css `main > .section.dark`). */
+/* stylelint-disable selector-class-pattern, property-no-vendor-prefix, media-feature-range-notation, no-descending-specificity */
+
+/* Aparición en cascada al entrar en la sección. Las clases las pone y las quita
+   el JS del bloque (sin JS, o con movimiento reducido, todo se ve desde el principio). */
+.experience-cards-container .reveal {
+  opacity: 0;
+  transform: translateY(var(--spacing-md));
+  transition: opacity var(--reveal-duration) ease, transform var(--reveal-duration) ease;
+}
+
+.experience-cards-container .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Filtro por nivel: plegado por defecto para que pase desapercibido */
+.experience-cards .xp-filter {
+  margin-bottom: var(--spacing-lg);
+  text-align: right; /* a la derecha, sobre las tarjetas */
+}
+
+.experience-cards .xp-filter__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--btn-height-sm);
+  color: var(--color-text-inverse);
+  font-size: var(--text-small);
+  font-weight: var(--btn-font-weight);
+  list-style: none;
+  cursor: pointer;
+}
+
+.experience-cards .xp-filter__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.experience-cards .xp-filter__current {
+  color: var(--color-text-inverse-muted);
+}
+
+.experience-cards .xp-filter__icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  transition: var(--btn-transition);
+}
+
+.experience-cards .xp-filter[open] .xp-filter__icon {
+  transform: rotate(180deg);
+}
+
+.experience-cards .xp-filter__options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  padding: 0;
+  border: 0;
+}
+
+.experience-cards .xp-filter__chip {
+  cursor: pointer;
+}
+
+.experience-cards .xp-filter__chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--btn-height-sm);
+  padding-inline: var(--spacing-sm);
+  border: var(--border-width) solid var(--color-text-inverse-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-inverse);
+  font-size: var(--text-small);
+  font-weight: var(--btn-font-weight);
+  transition: var(--btn-transition);
+}
+
+.experience-cards .xp-filter__chip:hover span {
+  border-color: var(--color-text-inverse);
+}
+
+.experience-cards .xp-filter__chip input:checked + span {
+  border-color: var(--color-text-inverse);
+  background-color: var(--color-text-inverse);
+  color: var(--color-off-black);
+}
+
+.experience-cards .xp-filter__chip input:focus-visible + span {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+.experience-cards .xp-list {
+  display: grid;
+  gap: var(--layout-gutter);
+}
+
+/* Tarjeta vertical: imagen con fecha, contenido y acción al pie */
+.experience-cards .xp-row {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: start;
+  gap: var(--spacing-base);
+  padding: var(--spacing-base);
+  border: var(--border-width) solid var(--color-text-inverse-subtle);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-off-black);
+}
+
+/* Imagen de la experiencia con la fecha encima, sobre panel desenfocado */
+.experience-cards .xp-row__media {
+  position: relative;
+  grid-column: 1 / -1;
+  overflow: hidden;
+  aspect-ratio: var(--xp-media-ratio);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-dark);
+}
+
+.experience-cards .xp-row__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--hover-duration) ease;
+}
+
+/* Hover (solo con ratón y sin movimiento reducido): zoom suave de la foto
+   dentro de su marco. Sin elevación: la tarjeta no es clicable, solo sus botones. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .experience-cards .xp-row:hover .xp-row__img {
+    transform: scale(var(--xp-zoom));
+  }
+}
+
+.experience-cards .xp-row__date {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  display: grid;
+  justify-items: center;
+  min-width: var(--btn-height-lg);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: var(--border-width) solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+  border-radius: var(--radius-md);
+  background-color: color-mix(in srgb, var(--color-bg-dark) var(--xp-glass), transparent);
+  -webkit-backdrop-filter: blur(var(--blur-arrow));
+  backdrop-filter: blur(var(--blur-arrow));
+  text-align: center;
+}
+
+.experience-cards .xp-row__day {
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-display);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.experience-cards .xp-row__month {
+  color: var(--color-text-inverse);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.experience-cards .xp-row__body {
+  display: grid;
+  gap: var(--spacing-2xs);
+}
+
+/* Etiqueta de nivel encima del nombre */
+.experience-cards .xp-row__body .badge {
+  justify-self: start;
+  margin-bottom: var(--spacing-2xs);
+}
+
+.experience-cards .xp-row__title {
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-display);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.experience-cards .xp-row__place {
+  color: var(--color-text-inverse);
+  font-size: var(--text-small);
+  font-weight: var(--btn-font-weight);
+}
+
+.experience-cards .xp-row__text {
+  font-size: var(--text-small);
+  line-height: var(--lh-small);
+}
+
+/* Acción: «Participar» a todo el ancho como foco del pie de la tarjeta;
+   la mejora de nivel, enlace de texto sutil centrado debajo */
+.experience-cards .xp-row__action {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.experience-cards .xp-row__action .btn {
+  justify-self: stretch;
+}
+
+.experience-cards .xp-row__upgrade {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-inverse);
+  font-size: var(--text-small);
+  font-weight: var(--btn-font-weight);
+  text-decoration: none;
+}
+
+.experience-cards .xp-row__upgrade-label {
+  text-decoration: underline;
+  text-decoration-color: var(--color-text-inverse-subtle);
+  text-underline-offset: var(--spacing-2xs);
+  transition: var(--btn-transition);
+}
+
+.experience-cards .xp-row__upgrade:hover .xp-row__upgrade-label {
+  text-decoration-color: var(--color-text-inverse);
+}
+
+.experience-cards .xp-row__upgrade svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+.experience-cards .xp-row__upgrade-hint {
+  margin-right: var(--spacing-2xs);
+  color: color-mix(in srgb, var(--color-text-inverse) var(--xp-hint-alpha), transparent);
+  font-weight: normal;
+}
+
+/* Exclusivas (entradas dobles): borde con el degradado del botón primario, halo
+   y etiqueta «Exclusiva» sobre la foto. Van primero en la retícula. */
+.experience-cards .xp-row--featured {
+  border: var(--border-width-strong) solid transparent;
+  background:
+    linear-gradient(var(--color-off-black), var(--color-off-black)) padding-box,
+    var(--gradient-btn-primary) border-box;
+  box-shadow: var(--btn-primary-shadow);
+}
+
+/* Etiqueta «Exclusiva»: mismo cristal que el panel de fecha (no el morado del botón,
+   para que no parezca clicable), con estrella */
+.experience-cards .xp-row__flag {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-2xs) var(--spacing-sm);
+  border: var(--border-width) solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--color-bg-dark) var(--xp-glass), transparent);
+  -webkit-backdrop-filter: blur(var(--blur-arrow));
+  backdrop-filter: blur(var(--blur-arrow));
+  color: var(--color-text-inverse);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.experience-cards .xp-row__flag svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+/* Estado sin acción (Agotado, Finalizada): botón desactivado, lo pone el JS.
+   Especificidad (0,1,0) como en el prototipo (styles.css L1217): así .reveal (opacity 0)
+   y .reveal.is-visible (opacity 1) le ganan mientras dura la aparición, igual que allí. */
+:where(.experience-cards) .xp-row--past {
+  opacity: var(--btn-disabled-opacity);
+}
+
+/* Tablet: dos tarjetas por fila (las dos exclusivas, juntas en la primera) */
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .experience-cards .xp-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .experience-cards .xp-row {
+    gap: var(--spacing-md);
+    padding: var(--padding-card-compact);
+  }
+}
+
+/* Escritorio: tres tarjetas por fila (seis tarjetas: dos filas completas) */
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  .experience-cards .xp-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

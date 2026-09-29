@@ -1,0 +1,89 @@
+/* 03 · Entradas del partido — literal port of prototype styles.css L705-789
+   (.btn-pair L601-611 lives in styles/styles.css). */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation */
+
+/* Objetivo secundario: después de Noticias. Tarjeta oscura con borde y halo
+   del botón primario; foto con los escudos encima | datos | compra. */
+.match-tickets .match-card {
+  --focus-color: var(--color-text-inverse);
+
+  display: grid;
+  gap: var(--spacing-md);
+  padding: var(--spacing-base);
+  border: var(--border-width-strong) solid transparent;
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(var(--color-off-black), var(--color-off-black)) padding-box,
+    var(--gradient-btn-primary) border-box;
+  box-shadow: var(--btn-primary-shadow);
+  color: var(--color-text-inverse);
+}
+
+.match-tickets .match-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--xp-media-ratio);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-dark);
+}
+
+.match-tickets .match-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--hover-duration) ease;
+}
+
+/* Hover (solo con ratón y sin movimiento reducido): mismo zoom suave que las
+   tarjetas de Experiencias. Solo crece la foto; los escudos quedan quietos. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .match-tickets .match-card:hover .match-card__img {
+    transform: scale(var(--xp-zoom));
+  }
+}
+
+/* Escudos (con el «vs» y un halo oscuro ya en la imagen) centrados sobre la foto */
+.match-tickets .match-card__teams {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--match-crest-width);
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+.match-tickets .match-card__body {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--spacing-sm);
+}
+
+.match-tickets .match-card__title {
+  font-family: var(--font-family-display);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.match-tickets .match-card__meta {
+  font-size: var(--text-small);
+  font-weight: var(--btn-font-weight);
+}
+
+/* Botones a todo el ancho de la columna (.btn-pair: columnas iguales desde tablet) */
+.match-tickets .match-card__action {
+  display: grid;
+  justify-self: stretch;
+  margin-top: var(--spacing-xs);
+}
+
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  .match-tickets .match-card {
+    grid-template-columns: 2fr 3fr;
+    gap: var(--spacing-xl);
+    padding: var(--padding-card-compact);
+  }
+}

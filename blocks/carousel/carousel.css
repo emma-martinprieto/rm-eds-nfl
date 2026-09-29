@@ -1,0 +1,197 @@
+/* 06 · Planes Madridista (carousel, variant `planes`) — literal port of prototype
+   styles.css L1243-1437 (.row-arrow base lives in styles/styles.css, L351-375). */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation, no-descending-specificity */
+
+.carousel .membership__slider {
+  position: relative;
+}
+
+.carousel .membership__slider .row-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.carousel .row-arrow--prev {
+  left: calc(var(--layout-margin) * -1 + var(--spacing-xs));
+}
+
+.carousel .row-arrow--next {
+  right: calc(var(--layout-margin) * -1 + var(--spacing-xs));
+}
+
+.carousel .membership__carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Arrastrar con el ratón */
+.carousel .membership__carousel.is-draggable {
+  cursor: grab;
+}
+
+.carousel .membership__carousel.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+/* Móvil y tablet: carrusel horizontal con scroll-snap. Se ve asomar la
+   siguiente tarjeta. Región enfocable para desplazarla con el teclado. */
+.carousel .membership__carousel {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--layout-margin);
+  scrollbar-width: none; /* sin barra: las flechas y la tarjeta que asoma ya indican que hay más */
+  margin-inline: calc(var(--layout-margin) * -1);
+  padding: var(--spacing-base) var(--layout-margin) var(--spacing-lg); /* arriba: etiqueta y elevación; abajo: sombra */
+}
+
+.carousel .membership__plans {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 85%;
+  gap: var(--gap-cards);
+}
+
+.carousel .membership__plans > .plan {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .carousel .membership__plans {
+    grid-auto-columns: 45%;
+  }
+}
+
+/* Tarjeta sutil: borde fino, sin fondo de color */
+.carousel .plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--padding-card-compact);
+  border: var(--border-width) solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-light);
+  transition: box-shadow var(--hover-duration) ease;
+}
+
+/* Al elegirla (ratón encima o foco en su botón): gana sombra, sin elevación */
+.carousel .plan:hover,
+.carousel .plan:focus-within {
+  box-shadow: var(--btn-primary-shadow);
+}
+
+/* Recomendado: borde más marcado */
+.carousel .plan--featured {
+  border: var(--border-width-strong) solid var(--color-text-primary);
+}
+
+/* Platinum: el degradado solo en el borde */
+.carousel .plan--platinum {
+  border: var(--border-width-strong) solid transparent;
+  background:
+    linear-gradient(var(--color-bg-light), var(--color-bg-light)) padding-box,
+    var(--gradient-platinum) border-box;
+}
+
+/* Etiqueta sobre el borde superior */
+.carousel .plan__tag {
+  position: absolute;
+  top: 0;
+  left: var(--padding-card-compact);
+  transform: translateY(-50%);
+  padding: var(--spacing-2xs) var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-caps);
+  line-height: var(--lh-heading);
+  text-transform: uppercase;
+}
+
+.carousel .plan__tag--platinum {
+  background: var(--platinum-surface);
+  color: var(--color-off-black);
+}
+
+.carousel .plan__name {
+  color: var(--color-text-title);
+  font-family: var(--font-family-display);
+  font-size: var(--text-title-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.carousel .plan__price {
+  color: var(--color-text-title);
+  font-size: var(--text-title-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--lh-heading);
+}
+
+.carousel .plan__period,
+.carousel .plan__alt {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-weight: normal;
+}
+
+.carousel .plan__claim {
+  color: var(--color-text-subtitle);
+  font-size: var(--text-small);
+}
+
+.carousel .plan__benefits {
+  display: grid;
+  gap: var(--spacing-xs);
+  align-self: stretch;
+  margin-block: var(--spacing-xs) var(--spacing-base);
+  font-size: var(--text-small);
+  line-height: var(--lh-small);
+}
+
+.carousel .plan__benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.carousel .plan__benefits .icon {
+  margin-top: var(--spacing-2xs);
+  color: var(--color-success-dark);
+}
+
+.carousel .plan__cta {
+  margin-top: auto;
+  align-self: stretch;
+}
+
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  .carousel .membership__carousel {
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .carousel .membership__plans {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+  }
+
+  .carousel .plan {
+    padding: var(--padding-card);
+  }
+
+  .carousel .plan__tag {
+    left: var(--padding-card);
+  }
+}

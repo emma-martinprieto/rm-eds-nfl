@@ -1,0 +1,134 @@
+/* Paquetes Hospitality — literal port of prototype styles.css L791-920. */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation */
+
+/* Paquetes Hospitality: banner propio debajo de la tarjeta del partido (refuerzo de venta VIP).
+   Texto a la izquierda y foto del palco a la derecha, fundida con el fondo con un degradado;
+   los cascos sobresalen por arriba. Borde en champán (--gradient-premium):
+   se lee como producto premium sin usar el morado de los botones.
+   Móvil y tablet: foto arriba (fundida hacia abajo) y texto debajo. */
+.hospitality-banner .hospitality {
+  --focus-color: var(--color-text-inverse);
+
+  position: relative;
+  display: grid;
+  margin-top: calc(var(--layout-gutter) + var(--hospitality-helmet) / 2); /* sitio para los cascos */
+  border: var(--border-width-strong) solid transparent;
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(var(--color-off-black), var(--color-off-black)) padding-box,
+    var(--gradient-premium) border-box;
+  color: var(--color-text-inverse-muted);
+}
+
+.hospitality-banner .hospitality__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--media-ratio);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.hospitality-banner .hospitality__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--hover-duration) ease;
+}
+
+/* Fundido de la foto con el fondo de la tarjeta (hacia abajo en móvil, hacia la izquierda en escritorio) */
+.hospitality-banner .hospitality__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--color-off-black), transparent 60%);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hospitality-banner .hospitality:hover .hospitality__img {
+    transform: scale(var(--xp-zoom));
+  }
+}
+
+/* Cascos enfrentados, sobresaliendo del borde superior */
+.hospitality-banner .hospitality__helmets {
+  position: absolute;
+  top: calc(var(--hospitality-helmet) / -2);
+  right: var(--spacing-base);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-2xs);
+  pointer-events: none;
+}
+
+.hospitality-banner .hospitality__helmet {
+  width: var(--hospitality-helmet);
+  height: auto;
+  filter: drop-shadow(0 var(--spacing-xs) var(--spacing-base) color-mix(in srgb, var(--color-bg-dark) 60%, transparent));
+}
+
+.hospitality-banner .hospitality__body {
+  position: relative; /* por encima de la foto en escritorio */
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-base) var(--spacing-md);
+}
+
+.hospitality-banner .hospitality__title {
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-display);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+/* Sin lista de espacios, la frase gana un escalón para sostener el bloque */
+.hospitality-banner .hospitality__lead {
+  max-width: var(--measure);
+  font-size: var(--text-body);
+}
+
+.hospitality-banner .hospitality__action {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-md);
+  justify-self: stretch;
+}
+
+@media (max-width: 767px) { /* por debajo de --breakpoint-tablet */
+  .hospitality-banner .hospitality__action .btn {
+    flex: 1 1 100%; /* botón a todo el ancho en móvil */
+  }
+}
+
+/* Escritorio: texto a la izquierda; la foto ocupa la mitad derecha y se funde hacia la izquierda */
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  .hospitality-banner .hospitality {
+    grid-template-columns: 1fr 1fr;
+    min-height: var(--hospitality-min-height);
+  }
+
+  .hospitality-banner .hospitality__media {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 60%;
+    aspect-ratio: auto;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  }
+
+  .hospitality-banner .hospitality__media::after {
+    background: linear-gradient(to right, var(--color-off-black), transparent 55%);
+  }
+
+  .hospitality-banner .hospitality__helmets {
+    right: var(--spacing-xl);
+  }
+
+  .hospitality-banner .hospitality__body {
+    padding: var(--padding-card-lg);
+  }
+}

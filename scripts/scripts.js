@@ -10,6 +10,8 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  toClassName,
+  toCamelCase,
 } from './aem.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
@@ -143,6 +145,36 @@ function decorateButtons(main) {
 }
 
 /**
+ * Applies section-metadata tables (this aem.js does not read them):
+ * `Style` values become section classes (dark, flush-top, light, split),
+ * `Id` becomes the section id (anchors #experiencias, #madridista…),
+ * any other key becomes a data attribute. The table is then removed.
+ * @param {Element} main The main element
+ */
+function decorateSectionMetadata(main) {
+  main.querySelectorAll(':scope > .section > div > .section-metadata').forEach((meta) => {
+    const section = meta.closest('.section');
+    [...meta.querySelectorAll(':scope > div')].forEach((row) => {
+      const [keyCell, valueCell] = row.children;
+      if (!keyCell || !valueCell) return;
+      const key = toClassName(keyCell.textContent);
+      const value = valueCell.textContent.trim();
+      if (!key || !value) return;
+      if (key === 'style') {
+        value.split(',').map((s) => toClassName(s.trim())).filter(Boolean)
+          .forEach((cls) => section.classList.add(cls));
+      } else {
+        section.dataset[toCamelCase(key)] = value;
+        if (key === 'id') section.id = value;
+      }
+    });
+    const wrapper = meta.parentElement;
+    meta.remove();
+    if (!wrapper.children.length) wrapper.remove();
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -151,8 +183,30 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateSectionMetadata(main);
   decorateBlocks(main);
   decorateButtons(main);
+}
+
+/**
+ * Decorative scroll-linked ball (prototype component 12, index.html L514-516).
+ * Not a block: appended to <body>; behaviour in scripts/scroll-ball.js.
+ */
+async function loadScrollBall() {
+  if (document.querySelector('.ball-layer')) return;
+  const layer = document.createElement('div');
+  layer.className = 'ball-layer';
+  layer.setAttribute('aria-hidden', 'true');
+  const img = document.createElement('img');
+  img.className = 'scroll-ball';
+  img.src = `${window.hlx.codeBasePath}/images/balon-nfl-madrid-game.webp`;
+  img.alt = '';
+  img.width = 501;
+  img.height = 386;
+  layer.append(img);
+  document.body.append(layer);
+  const { default: initScrollBall } = await import('./scroll-ball.js');
+  initScrollBall(img);
 }
 
 /**
@@ -160,10 +214,11 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  document.documentElement.lang = 'es';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    main.id = 'contenido'; // skip-link target (prototype <main id="contenido">)
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
@@ -194,6 +249,8 @@ async function loadLazy(doc) {
   if (hash && element) element.scrollIntoView();
 
   loadFooter(doc.querySelector('body > footer'));
+
+  loadScrollBall();
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();

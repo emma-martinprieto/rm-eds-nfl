@@ -1,0 +1,120 @@
+/* 10 · CTA final — literal port of prototype styles.css L1654-1769.
+   The block element (.closing-cta.block) plays section.final-cta. */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation, no-duplicate-selectors, no-descending-specificity */
+
+.closing-cta.block {
+  --focus-color: var(--color-text-inverse);
+
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-inverse);
+  text-align: center;
+}
+
+.closing-cta .final-cta__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+/* Capa oscura: fuerte en el centro (texto, AA) y suave en los bordes para que se vea el césped */
+.closing-cta.block {
+  --final-scrim-center: 80%;
+  --final-scrim-edge: 35%;
+}
+
+.closing-cta.block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse 55% 75% at 50% 50%,
+    color-mix(in srgb, var(--color-bg-dark) var(--final-scrim-center), transparent) 0%,
+    color-mix(in srgb, var(--color-bg-dark) var(--final-scrim-center), transparent) 60%,
+    color-mix(in srgb, var(--color-bg-dark) var(--final-scrim-edge), transparent) 100%);
+}
+
+.closing-cta .final-cta__inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: var(--gap-title-body);
+  padding-block: var(--layout-section-padding);
+}
+
+.closing-cta .final-cta__title {
+  font-family: var(--font-family-display);
+  max-width: 18ch;
+  font-size: var(--text-display-xl); /* un escalón más: la display condensada ocupa menos */
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.closing-cta .final-cta__text {
+  max-width: var(--measure);
+  color: var(--color-text-inverse-muted);
+  font-size: var(--text-body-lg);
+}
+
+.closing-cta .final-cta__secondary {
+  display: grid;
+  justify-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: var(--border-width) solid var(--color-text-inverse-subtle);
+}
+
+.closing-cta .final-cta__question {
+  font-size: var(--text-body-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.closing-cta .final-cta__secondary .btn {
+  margin-top: var(--spacing-xs);
+}
+
+.closing-cta .btn {
+  min-width: var(--final-cta-btn-width);
+}
+
+/* Balón que aterriza sobre el césped al llegar a la sección (JS del bloque).
+   Posición calculada: hueco libre a la derecha del título. */
+.closing-cta .final-cta__ball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: calc(var(--spacing-3xl) * 1.25);
+  height: auto;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 var(--spacing-base) var(--spacing-md) color-mix(in srgb, var(--color-bg-dark) 60%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closing-cta .final-cta__ball {
+    display: none;
+  }
+}
+
+/* Móvil y tablet: zona de césped bajo el último botón donde aterriza el balón
+   (junto al título centrado no hay hueco) */
+@media (max-width: 1023px) { /* < --breakpoint-desktop */
+  .closing-cta .final-cta__inner {
+    padding-bottom: calc(var(--layout-section-padding) + var(--spacing-3xl));
+  }
+}
+
+@media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+  .closing-cta .final-cta__inner {
+    padding-bottom: var(--layout-section-padding);
+  }
+}

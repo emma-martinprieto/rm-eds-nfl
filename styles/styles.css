@@ -1,93 +1,712 @@
-/*
- * Copyright 2020 Adobe. All rights reserved.
- * This file is licensed to you under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License. You may obtain a copy
- * of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under
- * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
- * OF ANY KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
- */
+/* ═══════════════════════════════════════════════════════
+   NFL Madrid Game 2026 — global styles (EDS port of the prototype)
+   Literal port of import-work/prototype/css/tokens.css (L1-177) and the
+   global parts of css/styles.css (fonts, values, reset, base, layout,
+   shared atoms). Component CSS lives in each block.
+   The boilerplate globals that break the 1:1 (heading/p sizes, .button,
+   section paddings, --nav-height, roboto fallbacks) are removed.
+   ═══════════════════════════════════════════════════════ */
+
+/* stylelint-disable color-hex-length, color-function-notation, alpha-value-notation, media-feature-range-notation, selector-class-pattern, property-no-vendor-prefix, font-family-name-quotes, no-descending-specificity, custom-property-empty-line-before, comment-empty-line-before, declaration-block-single-line-max-declarations, value-keyword-case, color-function-alias-notation, no-duplicate-selectors, property-no-deprecated, declaration-empty-line-before */
 
 :root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* ═══════════════════════════════════════════════════════
+     Madridistas — Design Tokens
+     Fuente de verdad: Cibeles Design System v4.0
+     Nomenclatura: espejo de las variables de Figma
+     (color/primary → --color-primary). Ver tokens-handoff.md
+     ═══════════════════════════════════════════════════════ */
 
-  /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 19px;
-  --body-font-size-xs: 17px;
+  /* ─── Color · Primary ────────────────────────────────── */
+  --color-primary:            #3E31FA;
+  --color-primary-dark:       #2115AB;
+  --color-primary-medium:     #8FA0F5;
+  --color-primary-light:      #DEE5FD;
+  --color-primary-bg:         #EEF2FD;
+  --color-secondary:          #8760F6;
 
-  /* heading sizes */
-  --heading-font-size-xxl: 55px;
-  --heading-font-size-xl: 44px;
-  --heading-font-size-l: 34px;
-  --heading-font-size-m: 27px;
-  --heading-font-size-s: 24px;
-  --heading-font-size-xs: 22px;
+  /* ─── Color · Semánticos ─────────────────────────────── */
+  --color-success:            #3D923D;
+  --color-success-light:      #F1F9EA;
+  --color-success-dark:       #026C02;
+  --color-warning:            #EAAC30;
+  --color-danger:             #CA024F;
+  --color-danger-dark:        #9E0038;
 
-  /* nav height */
-  --nav-height: 64px;
+  /* ─── Color · Fondos / superficies ───────────────────── */
+  --color-bg-dark:            #0A0A0A;
+  --color-bg-light:           #FFFFFF;
+  --color-surface-offwhite:   #FAFCFF;
+  --color-surface-light:      #F3F5F8;
+  --color-line:               #E1E5EA;
+  --color-off-black:          #14142B;
+
+  /* ─── Color · Texto (sobre claro) ────────────────────── */
+  --color-text-primary:       #0F2145;
+  --color-text-secondary:     #43526E;
+  --color-text-muted:         #5E6A83;
+  --color-text-disabled:      #8C95A6;
+
+  /* Texto · roles */
+  --color-text-title:         var(--color-text-primary);
+  --color-text-subtitle:      #29395A;
+  --color-text-body:          var(--color-text-secondary);
+
+  /* Texto · sobre oscuro (inverse) */
+  --color-text-inverse:         rgba(255, 255, 255, 1);
+  --color-text-inverse-muted:   rgba(255, 255, 255, 0.65);
+  --color-text-inverse-subtle:  rgba(255, 255, 255, 0.45);
+
+  /* ─── Gradients ──────────────────────────────────────── */
+  --gradient-btn-primary:     linear-gradient(4deg, #3E31FA 19%, #8760F6 94%);
+  --gradient-premium:         linear-gradient(135deg, #E4D0AB 0%, #F3F6F9 100%);
+  --gradient-platinum:        linear-gradient(135deg, #636682 0%, #BDBECC 50%, #A8AABD 100%);
+  --gradient-card-dark:       linear-gradient(155deg, #14142B 0%, #0A0A0A 100%); /* fondo dark de cards (flip card, etc.) — reemplaza el navy inventado por el agente */
+
+  /* ─── Spacing · base ×8 ──────────────────────────────── */
+  --spacing-2xs:              4px;
+  --spacing-xs:               8px;
+  --spacing-sm:               12px;
+  --spacing-base:             16px;
+  --spacing-md:               24px;
+  --spacing-lg:               32px;
+  --spacing-xl:               48px;
+  --spacing-2xl:              64px;
+  --spacing-section:          96px;
+  --spacing-3xl:              128px;
+
+  /* ─── Border Radius ──────────────────────────────────── */
+  --radius-sm:                8px;
+  --radius-md:                12px;
+  --radius-lg:                16px;
+  --radius-xl:                20px;
+  --radius-2xl:               24px;
+  --radius-3xl:               32px;
+  --radius-pill:              9999px;
+
+  /* ─── Typography (RM Neue, responsive con clamp) ─────── */
+  /* RM Neue: no font file exists (user decision 2). Kept literally; resolves to sans-serif. */
+  --font-family:              'RM Neue', sans-serif;
+
+  /* Display — Bold */
+  --text-display-xl:          clamp(52px, 7vw, 88px);   /* lh 1.0   · tracking -3px   */
+  --text-display-lg:          clamp(40px, 5.5vw, 72px); /* lh 1.08  · tracking -2px   */
+  --text-display-md:          clamp(32px, 4vw, 56px);   /* lh 1.08  · tracking -1px   */
+  --text-display-sm:          clamp(28px, 3vw, 48px);   /* lh 1.15  · tracking -0.5px */
+
+  /* Body / texto */
+  --text-body-lg:             18px;  /* lh 1.65 · Regular/600 */
+  --text-body:                16px;  /* lh 1.65 · Regular     */
+  --text-small:               14px;  /* lh 1.60 · Regular     */
+  --text-caption:             12px;  /* lh 1.50 · Regular     */
+
+  /* ─── Breakpoints ────────────────────────────────────── */
+  --breakpoint-tablet:        768px;   /* Tablet  768–1023 */
+  --breakpoint-desktop:       1024px;  /* Desktop 1024–1439 */
+  --breakpoint-wide:          1440px;  /* Wide    ≥1440 — donde entra el margen 96 */
+
+  /* ─── Grid (columnas · gutter · margin por breakpoint) ─ */
+  --grid-columns-mobile:      4;
+  --grid-columns-tablet:      8;
+  --grid-columns-desktop:     12;
+
+  /* Grid confirmado de Cibeles (27/08/2026), en cuatro escalones para que el margen 64
+     entre a 1024 (container ~897, como su "Tablet 1025") y el 96 a 1440 (container 1248).
+     Header, banners, footer y fondos fotográficos van a ancho completo. */
+  --grid-gutter-mobile:       24px;   /* < 768   */
+  --grid-gutter-tablet:       24px;   /* 768–1023 */
+  --grid-gutter-desktop:      24px;   /* 1024–1439 */
+  --grid-gutter-wide:         32px;   /* ≥ 1440  */
+
+  --grid-margin-mobile:       24px;   /* contenido = ancho − 48  */
+  --grid-margin-tablet:       40px;   /* 768 → 688px de contenido */
+  --grid-margin-desktop:      64px;   /* 1024 → 896px de contenido */
+  --grid-margin-wide:         96px;   /* 1440 → 1248px de contenido */
+
+  /* ═══════════════════════════════════════════════════════
+     BOTONES
+     ═══════════════════════════════════════════════════════ */
+
+  /* Tamaños (altura fija · padding generoso) */
+  --btn-height-sm:            40px;
+  --btn-height-md:            48px;
+  --btn-height-lg:            56px;
+
+  --btn-padding-sm:           10px 20px;
+  --btn-padding-md:           14px 28px;
+  --btn-padding-lg:           16px 36px;
+
+  --btn-radius:               var(--radius-md);   /* 12px */
+  --btn-gap-icon:             8px;                /* separación texto ↔ icono */
+  --btn-font-size:            16px;
+  --btn-font-weight:          600;
+
+  /* Primary — fondo gradiente, texto blanco */
+  --btn-primary-bg:           var(--gradient-btn-primary);
+  --btn-primary-bg-hover:     var(--color-primary);
+  --btn-primary-bg-pressed:   var(--color-primary-dark);
+  --btn-primary-text:         var(--color-text-inverse);
+  --btn-primary-shadow:       0 10px 24px -8px rgba(54, 49, 116, 0.65);
+
+  /* Secondary — outline */
+  --btn-secondary-bg:         transparent;
+  --btn-secondary-bg-hover:   var(--color-primary-bg);
+  --btn-secondary-border:     1.5px solid var(--color-primary);
+  --btn-secondary-text:       var(--color-primary);
+
+  /* Estados compartidos */
+  --btn-focus-ring:           0 0 0 3px var(--color-primary-light);  /* WCAG */
+  --btn-disabled-bg:          var(--color-surface-light);
+  --btn-disabled-text:        var(--color-text-disabled);
+  --btn-disabled-opacity:     0.5;
+  --btn-transition:           all 0.2s ease;
+
+  /* ═══════════════════════════════════════════════════════
+     ESPACIADO DE COMPONENTES (generoso)
+     ═══════════════════════════════════════════════════════ */
+
+  /* Padding interno de tarjetas */
+  --padding-card:             32px;   /* tarjetas estándar */
+  --padding-card-lg:          40px;   /* tarjeta destacada / pricing */
+  --padding-card-compact:     24px;   /* tarjetas densas (FAQ, listas) */
+
+  /* Padding vertical de secciones */
+  --padding-section-mobile:   64px;
+  --padding-section-tablet:   88px;
+  --padding-section-desktop:  120px;  /* aire generoso entre secciones */
+
+  /* Gaps de composición */
+  --gap-cards:                24px;   /* entre tarjetas de una fila */
+  --gap-stack:                20px;   /* entre bloques de texto apilados */
+  --gap-inline:               12px;   /* entre elementos en línea */
+  --gap-list:                 14px;   /* entre ítems de una lista/bullets */
+
+  /* Ritmo tipográfico */
+  --gap-title-body:           16px;   /* título → párrafo */
+  --gap-body-cta:             32px;   /* párrafo → botón */
+  --gap-header-content:       48px;   /* encabezado de sección → contenido */
 }
 
-/* fallback fonts */
+
+/* ─── Tipografía de títulos · Bernabéu ───────────────── */
+/* styles.css L13-20. Only font file re-hosted (user decision): /fonts/bernabeu-black.woff2 */
 @font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
-  src: local('Arial');
+  font-family: 'Bernabeu';
+  font-style: normal;
+  font-weight: 700 900; /* un solo archivo Black: sirve también para bold, sin negrita sintética */
+  font-display: swap;
+  src: local('Bernabeu Black'), local('Bernabeu-Black'),
+       url('/fonts/bernabeu-black.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
+:root {
+  --font-family-display: 'Bernabeu', var(--font-family);
 }
 
-@media (width >= 900px) {
-  :root {
-    /* body sizes */
-    --body-font-size-m: 18px;
-    --body-font-size-s: 16px;
-    --body-font-size-xs: 14px;
-
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
-    --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
-  }
+/* ─── Valores sin token en tokens.css (styles.css L30-58) ── */
+:root {
+  --lh-display:         1.08;   /* tokens.css · display-lg / md */
+  --lh-heading:         1.2;
+  --lh-body:            1.65;   /* tokens.css · body */
+  --lh-small:           1.6;    /* tokens.css · small */
+  --tracking-display:   0.01em; /* ajustado a la display condensada (tokens.css daba -1px para RM Neue) */
+  --tracking-caps:      0.08em; /* eyebrows y etiquetas en mayúsculas */
+  --font-weight-bold:   700;
+  --border-width:       1px;
+  --border-width-strong: 1.5px; /* mismo grosor que --btn-secondary-border */
+  --focus-width:        2px;
+  --focus-offset:       2px;
+  --icon-size:          1.125em;
+  --measure:            60ch;   /* ancho máximo de lectura */
+  --media-ratio:        3 / 2;
+  --blur-arrow:         12px;   /* desenfoque de fondo del «Row Arrow» (Figma) */
+  --text-title-sm:      28px;
+  --flip-duration:      0.6s;   /* giro de las tarjetas de noticias (sin token de duración) */
+  --reveal-duration:    0.6s;   /* aparición en cascada de Experiencias (sin token de duración) */
+  --final-cta-btn-width: 12em;  /* los dos botones del CTA final, en bloques distintos, igual de anchos */
+  --xp-hint-alpha:      50%;    /* «¿No eres Premium?»: gris más sutil que -muted; 5,3:1 sobre la tarjeta (AA) */
+  --hover-duration:     0.4s;   /* zoom de foto y sombra de planes al pasar el ratón (sin token de duración) */
+  --xp-zoom:            1.05;   /* zoom de la foto al pasar el ratón */
+  --xp-media-ratio:     16 / 9;  /* imagen de las tarjetas de Experiencias */
+  --xp-glass:           64%;    /* opacidad del panel de fecha sobre la foto: AA con blanco sobre cualquier foto */
+  --match-crest-width:  40%;    /* escudos «Bengals vs Falcons» sobre la foto de la tarjeta de entradas */
+  --hospitality-helmet: clamp(88px, 10vw, 152px); /* cascos que sobresalen del banner Hospitality */
+  --hospitality-min-height: 360px; /* alto mínimo del banner Hospitality en escritorio */
 }
 
+
+/* ─── Reset mínimo (styles.css L62-100) ───────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+h1, h2, h3, h4, h5, h6,
+p, figure, blockquote,
+ul, ol, dl, dd {
+  margin: 0;
+}
+
+ul[role="list"],
+ol[role="list"] {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* hidden gana siempre, aunque el componente declare su propio display */
+[hidden] {
+  display: none !important;
+}
+
+
+/* ─── Base (styles.css L104-122) ─────────────────────── */
+body {
+  position: relative; /* contenedor de la capa del balón decorativo (12) */
+  font-family: var(--font-family);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  color: var(--color-text-body);
+  background-color: var(--color-bg-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* EDS: body is revealed once the first section is decorated (boilerplate) */
 body {
   display: none;
-  margin: 0;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: var(--body-font-family);
-  font-size: var(--body-font-size-m);
-  line-height: 1.6;
 }
 
 body.appear {
   display: block;
 }
 
-header {
-  height: var(--nav-height);
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
+a {
+  color: var(--color-primary);
+}
+
+
+/* ─── Foco visible (styles.css L129-132) ─────────────── */
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus-color, var(--color-primary));
+  outline-offset: var(--focus-offset);
+}
+
+
+/* ─── Movimiento reducido (styles.css L138-147) ──────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT (styles.css L158-198)
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  --layout-columns:         var(--grid-columns-mobile);
+  --layout-gutter:          var(--grid-gutter-mobile);
+  --layout-margin:          var(--grid-margin-mobile);
+  --layout-section-padding: var(--padding-section-mobile);
+}
+
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  :root {
+    --layout-columns:         var(--grid-columns-tablet);
+    --layout-gutter:          var(--grid-gutter-tablet);
+    --layout-margin:          var(--grid-margin-tablet);
+    --layout-section-padding: var(--padding-section-tablet);
+  }
+}
+
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  :root {
+    --layout-columns:         var(--grid-columns-desktop);
+    --layout-gutter:          var(--grid-gutter-desktop);
+    --layout-margin:          var(--grid-margin-desktop);
+    --layout-section-padding: var(--padding-section-desktop);
+  }
+}
+
+@media (min-width: 1440px) { /* --breakpoint-wide */
+  :root {
+    --layout-gutter:          var(--grid-gutter-wide);
+    --layout-margin:          var(--grid-margin-wide);
+    /* columnas y padding de sección: se mantienen los de desktop (no hay token -wide) */
+  }
+}
+
+/* Contenedor: márgenes laterales de la retícula.
+   Tope en --breakpoint-wide → 1248px de contenido a partir de 1440. */
+.container {
+  width: 100%;
+  max-width: var(--breakpoint-wide);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   EDS SECTIONS (block-style-spec §2.3)
+   Every EDS section gets `.section`; the prototype's `.section` padding
+   applies only to Experiencias, Planes, Noticias, Entradas and FAQ.
+   ═══════════════════════════════════════════════════════ */
+
+/* = .section L202-204 */
+main > .section {
+  padding-block: var(--layout-section-padding);
+}
+
+main > .section.hero-container,
+main > .section.event-countdown-container,
+main > .section.closing-cta-container {
+  padding-block: 0;
+}
+
+/* = .section--flush-top L208-210 */
+main > .section.flush-top {
+  padding-top: 0;
+}
+
+/* = .container */
+main > .section > div {
+  width: 100%;
+  max-width: var(--breakpoint-wide);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
+
+/* full-bleed blocks: their JS creates their own inner .container */
+main > .section.hero-container > div,
+main > .section.event-countdown-container > div,
+main > .section.closing-cta-container > div {
+  max-width: none;
+  padding-inline: 0;
+}
+
+/* Section head (default content before a block) = .section-head L412-431 */
+main > .section > .default-content-wrapper {
+  display: grid;
+  gap: var(--gap-title-body);
+  margin-bottom: var(--gap-header-content);
+}
+
+main > .section > .default-content-wrapper h2 {
+  font-family: var(--font-family-display);
+  color: var(--color-text-title);
+  font-size: var(--text-display-lg); /* un escalón más: la display condensada ocupa menos */
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+main > .section > .default-content-wrapper p {
+  max-width: var(--measure);
+  font-size: var(--text-body-lg);
+}
+
+/* Style: dark = .experiences L924-932 */
+main > .section.dark {
+  --focus-color: var(--color-text-inverse);
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-inverse-muted);
+}
+
+main > .section.dark > .default-content-wrapper h2 {
+  color: var(--color-text-inverse);
+}
+
+/* Style: light = .faq L1589-1591 */
+main > .section.light {
+  background-color: var(--color-surface-light);
+}
+
+/* Style: split = .faq__inner L1593-1596 + L1647-1652 (container widths kept) */
+main > .section.split {
+  display: grid;
+  gap: var(--gap-header-content);
+  padding-inline: max(var(--layout-margin), calc((100% - var(--breakpoint-wide)) / 2 + var(--layout-margin)));
+}
+
+main > .section.split > div {
+  max-width: none;
+  margin: 0;
+  padding-inline: 0;
+}
+
+main > .section.split > .default-content-wrapper {
+  margin-bottom: 0;
+}
+
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  main > .section.split {
+    grid-template-columns: 1fr 2fr;
+    gap: var(--layout-gutter);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   ÁTOMOS COMPARTIDOS (styles.css L219-431, L601-611)
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Utilidades ─────────────────────────────────────── */
+.icon {
+  flex: none;
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+/* Oculto a la vista, disponible para lectores de pantalla */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  z-index: 10;
+  padding: var(--spacing-xs) var(--spacing-base);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-light);
+  color: var(--color-primary);
+  font-weight: var(--btn-font-weight);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* ─── Platinum ───────────────────────────────────────── */
+/* Todo lo Platinum usa --gradient-platinum. Se muestra solo su tramo
+   claro (del 50 % al final): el tramo oscuro #636682 no da AA con
+   texto oscuro. Texto --color-off-black sobre el tramo claro ≈ 7:1. */
+:root {
+  --platinum-surface: var(--gradient-platinum) 100% 0 / 200% 100% no-repeat border-box;
+}
+
+/* ─── Botón ──────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap-icon);
+  min-height: var(--btn-height-md);
+  padding: var(--btn-padding-md);
+  border: var(--border-width-strong) solid transparent;
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  line-height: var(--lh-heading);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--btn-transition);
+}
+
+.btn--sm {
+  min-height: var(--btn-height-sm);
+  padding: var(--btn-padding-sm);
+  font-size: var(--text-small);
+}
+
+.btn--primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  box-shadow: var(--btn-primary-shadow);
+}
+
+.btn--primary:hover {
+  background: var(--btn-primary-bg-hover);
+}
+
+.btn--primary:active {
+  background: var(--btn-primary-bg-pressed);
+}
+
+/* Desactivado (p. ej. «Agotado»): tokens --btn-disabled-* */
+.btn:disabled,
+.btn:disabled:hover {
+  background: var(--btn-disabled-bg);
+  color: var(--btn-disabled-text);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  border: var(--btn-secondary-border);
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+}
+
+.btn--secondary:hover {
+  background: var(--btn-secondary-bg-hover);
+}
+
+/* Contorno blanco para fondos oscuros */
+.btn--inverse {
+  border-color: var(--color-text-inverse);
+  background: transparent;
+  color: var(--color-text-inverse);
+}
+
+.btn--platinum {
+  background: var(--platinum-surface);
+  color: var(--color-off-black);
+}
+
+.btn--platinum:hover {
+  background: var(--color-off-black);
+  color: var(--color-text-inverse);
+}
+
+.btn--inverse:hover {
+  background: var(--color-text-inverse);
+  color: var(--color-bg-dark);
+}
+
+/* ─── Flecha de carrusel («Row Arrow» en Figma) ─────── */
+/* 48×48, fondo bg-dark al 56 % (80 % en hover), borde blanco al 16 %,
+   desenfoque de fondo 12 px y chevron blanco de 24 px. */
+.row-arrow {
+  --focus-color: var(--color-primary);
+
+  display: grid;
+  place-items: center;
+  width: var(--btn-height-md);
+  height: var(--btn-height-md);
+  padding: 0;
+  border: var(--border-width) solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--color-bg-dark) 56%, transparent);
+  color: var(--color-text-inverse);
+  -webkit-backdrop-filter: blur(var(--blur-arrow));
+  backdrop-filter: blur(var(--blur-arrow));
+  cursor: pointer;
+  transition: var(--btn-transition);
+}
+
+.row-arrow:hover {
+  background-color: color-mix(in srgb, var(--color-bg-dark) 80%, transparent);
+}
+
+.row-arrow__icon {
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+}
+
+/* ─── Etiqueta de nivel ──────────────────────────────── */
+.badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: var(--spacing-2xs) var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-caps);
+  line-height: var(--lh-heading);
+  text-transform: uppercase;
+}
+
+.badge--free {
+  background-color: var(--color-success-light);
+  color: var(--color-success-dark);
+}
+
+.badge--premium {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.badge--tbc {
+  background-color: var(--color-surface-light);
+  color: var(--color-text-secondary);
+}
+
+.badge--platinum,
+.badge--vip {
+  background: var(--platinum-surface);
+  color: var(--color-off-black);
+}
+
+/* ─── Encabezado de sección (hooks set by block JS) ──── */
+.section-head {
+  display: grid;
+  gap: var(--gap-title-body);
+  margin-bottom: var(--gap-header-content);
+}
+
+.section-head__title {
+  font-family: var(--font-family-display);
+  color: var(--color-text-title);
+  font-size: var(--text-display-lg); /* un escalón más: la display condensada ocupa menos */
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.section-head__lead {
+  max-width: var(--measure);
+  font-size: var(--text-body-lg);
+}
+
+/* Pareja de botones: los dos miden lo que el más largo (texto + padding del token).
+   En móvil, uno debajo del otro; desde tablet, en línea */
+.btn-pair {
+  display: inline-grid;
+  grid-auto-columns: 1fr;
+  gap: var(--gap-inline);
+}
+
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .btn-pair {
+    grid-auto-flow: column;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   HEADER / FOOTER (EDS fragments) — reveal once decorated
+   ═══════════════════════════════════════════════════════ */
 header .header,
 footer .footer {
   visibility: hidden;
@@ -98,228 +717,39 @@ footer .footer[data-block-status="loaded"] {
   visibility: visible;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
-  font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
-  scroll-margin: 40px;
-}
 
-h1 { font-size: var(--heading-font-size-xxl); }
-h2 { font-size: var(--heading-font-size-xl); }
-h3 { font-size: var(--heading-font-size-l); }
-h4 { font-size: var(--heading-font-size-m); }
-h5 { font-size: var(--heading-font-size-s); }
-h6 { font-size: var(--heading-font-size-xs); }
-
-p,
-dl,
-ol,
-ul,
-pre,
-blockquote {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
-}
-
-code,
-pre {
-  font-size: var(--body-font-size-s);
-}
-
-pre {
-  padding: 16px;
-  border-radius: 8px;
-  background-color: var(--light-color);
-  overflow-x: auto;
-  white-space: pre;
-}
-
-main > div {
-  margin: 40px 16px;
-}
-
-input,
-textarea,
-select,
-button {
-  font: inherit;
-}
-
-/* links */
-a:any-link {
-  color: var(--link-color);
-  text-decoration: none;
-  overflow-wrap: break-word;
-}
-
-a:hover {
-  color: var(--link-hover-color);
-  text-decoration: underline;
-}
-
-/* buttons */
-p.button-wrapper {
-  margin: 12px 0;
-}
-
-a.button:any-link,
-button.button {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 100%;
-  margin: 0;
-  border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
-  font: inherit;
-  font-weight: 500;
-  line-height: 1.25;
-  text-decoration: none;
-  cursor: pointer;
+/* ─── 12 · Balón decorativo (styles.css L1776-1805) ─── */
+/* Posicionado respecto al documento. scripts/scroll-ball.js lo anima solo al salir del vídeo
+   (con el scroll, en todos los tamaños). El aterrizaje final es .final-cta__ball. */
+/* Capa a toda la altura del documento que recorta el balón cuando sale por
+   los lados: así no aparece scroll horizontal. */
+.ball-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-a.button[aria-disabled="true"],
-button.button:disabled {
-  cursor: not-allowed;
   pointer-events: none;
 }
 
-a.button.primary,
-button.button.primary {
-  border-color: var(--text-color);
-  background-color: var(--text-color);
-  color: var(--background-color);
-}
-
-a.button.primary:hover,
-a.button.primary:focus-visible,
-button.button.primary:hover,
-button.button.primary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--dark-color);
-  color: var(--light-color);
-}
-
-a.button.primary[aria-disabled="true"],
-a.button.primary[aria-disabled="true"]:hover,
-a.button.primary[aria-disabled="true"]:focus-visible,
-button.button.primary:disabled,
-button.button.primary:disabled:hover,
-button.button.primary:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-a.button.secondary,
-button.button.secondary {
-  border-color: var(--text-color);
-  background-color: transparent;
-  color: var(--text-color);
-}
-
-a.button.secondary:hover,
-a.button.secondary:focus-visible,
-button.button.secondary:hover,
-button.button.secondary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-a.button.secondary[aria-disabled="true"],
-a.button.secondary[aria-disabled="true"]:hover,
-a.button.secondary[aria-disabled="true"]:focus-visible,
-button.button.secondary:disabled,
-button.button.secondary:disabled:hover,
-button.button.secondary:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-/* high-impact call-to-action */
-a.button.accent,
-button.button.accent {
-  border-color: var(--link-color);
-  background-color: var(--link-color);
-  color: var(--background-color);
-}
-
-a.button.accent:hover,
-a.button.accent:focus-visible,
-button.button.accent:hover,
-button.button.accent:focus-visible {
-  border-color: var(--link-hover-color);
-  background-color: var(--link-hover-color);
-}
-
-a.button.accent[aria-disabled="true"],
-a.button.accent[aria-disabled="true"]:hover,
-a.button.accent[aria-disabled="true"]:focus-visible,
-button.button.accent:disabled,
-button.button.accent:disabled:hover,
-button.button.accent:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-main img {
-  max-width: 100%;
-  width: auto;
+.scroll-ball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: var(--spacing-3xl);
   height: auto;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
-.icon {
-  display: inline-block;
-  height: 24px;
-  width: 24px;
+/* Sombra durante el salto: refuerza la sensación de profundidad */
+.scroll-ball.is-jumping {
+  filter: drop-shadow(0 var(--spacing-md) var(--spacing-lg) color-mix(in srgb, var(--color-bg-dark) 45%, transparent));
 }
 
-.icon img {
-  height: 100%;
-  width: 100%;
-}
-
-/* sections */
-main > .section {
-  margin: 40px 0;
-}
-
-main > .section > div {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 24px;
-}
-
-main > .section:first-of-type {
-  margin-top: 0;
-}
-
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
+@media (prefers-reduced-motion: reduce) {
+  .scroll-ball {
+    display: none;
   }
-}
-
-/* section metadata */
-main .section.light,
-main .section.highlight {
-  background-color: var(--light-color);
-  margin: 0;
-  padding: 40px 0;
 }

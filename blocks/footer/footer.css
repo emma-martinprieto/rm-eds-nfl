@@ -1,20 +1,66 @@
-footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+/* 11 · Footer — literal port of prototype styles.css L1807-1868.
+   The <footer> element (footer.footer-wrapper.site-footer) plays .site-footer. */
+/* stylelint-disable selector-class-pattern, no-descending-specificity */
+
+footer.site-footer {
+  --focus-color: var(--color-text-inverse);
+
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-inverse-muted);
+  font-size: var(--text-small);
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+footer .site-footer__inner {
+  display: grid;
+  gap: var(--spacing-lg);
+  padding-block: var(--spacing-2xl);
 }
 
-footer .footer p {
-  margin: 0;
+/* Cierre de marca: NFL Madrid Game · Bernabéu · Madridistas.
+   Alturas distintas para igualar el peso visual (escudo alto, logotipos anchos). */
+footer .site-footer__logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md) var(--spacing-lg);
 }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
-  }
+footer .site-footer__logos img {
+  width: auto;
+}
+
+footer .site-footer__logo--game {
+  height: var(--spacing-2xl);
+}
+
+footer .site-footer__logo--bernabeu {
+  height: var(--spacing-base);
+}
+
+footer .site-footer__logo--madridistas {
+  height: var(--spacing-xl);
+}
+
+footer.site-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs) var(--spacing-md);
+}
+
+footer.site-footer a {
+  color: var(--color-text-inverse);
+  text-decoration: none;
+}
+
+footer.site-footer a:hover {
+  text-decoration: underline;
+}
+
+footer .site-footer__legal {
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width) solid var(--color-text-inverse-subtle);
+}
+
+footer .site-footer__legal a {
+  color: var(--color-text-inverse-muted);
 }

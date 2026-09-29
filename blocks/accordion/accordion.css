@@ -1,0 +1,43 @@
+/* 09 · FAQ — literal port of prototype styles.css L1608-1645.
+   Section background and the 1fr/2fr split come from section-metadata `Style: light, split`
+   (styles/styles.css). */
+/* stylelint-disable selector-class-pattern */
+
+.accordion .faq__item {
+  border-bottom: var(--border-width) solid var(--color-line);
+}
+
+.accordion .faq__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+  padding-block: var(--spacing-md);
+  color: var(--color-text-title);
+  font-size: var(--text-body-lg);
+  font-weight: var(--btn-font-weight);
+  list-style: none;
+  cursor: pointer;
+}
+
+.accordion .faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Indicador: chevron (icono «Forward» de Figma). Gira al abrir. */
+.accordion .faq__icon {
+  flex: none;
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+  color: var(--color-off-black);
+  transition: var(--btn-transition);
+}
+
+.accordion .faq__item[open] .faq__icon {
+  transform: rotate(180deg);
+}
+
+.accordion .faq__item p {
+  max-width: var(--measure);
+  padding-bottom: var(--spacing-md);
+}

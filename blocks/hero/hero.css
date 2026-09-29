@@ -1,37 +1,102 @@
-.hero-container .hero-wrapper {
-  max-width: unset;
-  padding: 0;
-}
+/* 01 · Hero — literal port of prototype styles.css L519-597 + L613-630.
+   The block element (.hero.block) plays section.hero. */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation, no-duplicate-selectors, declaration-block-single-line-max-declarations */
 
-.hero {
+/* Ancho completo (fondo audiovisual); el texto va en .container. */
+.hero.block {
+  --focus-color: var(--color-text-inverse);
+
   position: relative;
-  padding: 40px 24px;
-  min-height: 300px;
+  display: flex;
+  align-items: flex-end;
+  min-height: 88svh; /* provisional: altura del hero pendiente de diseño, sin token */
+  overflow: hidden;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-inverse);
 }
 
-.hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
-}
-
-.hero picture {
+.hero .hero__media {
   position: absolute;
-  z-index: -1;
   inset: 0;
-  object-fit: cover;
-  box-sizing: border-box;
 }
 
-.hero img {
-  object-fit: cover;
+.hero .hero__video {
   width: 100%;
   height: 100%;
+  max-width: none;
+  object-fit: cover;
 }
 
-@media (width >= 900px) {
-  .hero {
-    padding: 40px 32px;
-  }
+/* Capa de oscurecimiento: solo detrás del texto (abajo e izquierda),
+   el resto del vídeo queda limpio. Intensidad ajustada al mínimo que
+   mantiene AA midiendo el contraste sobre los fotogramas del vídeo. */
+.hero.block {
+  /* Mínimo medido para AA (texto 4,5:1, H1 3:1) sobre 21 fotogramas del vídeo.
+     Si cambian el vídeo, la tipografía o los textos, hay que volver a medir. */
+  --hero-scrim: 45%;                /* móvil */
+}
+
+@media (min-width: 768px) {         /* --breakpoint-tablet */
+  .hero.block { --hero-scrim: 25%; }
+}
+
+@media (min-width: 1024px) {        /* --breakpoint-desktop */
+  .hero.block { --hero-scrim: 35%; }
+}
+
+.hero .hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, color-mix(in srgb, var(--color-bg-dark) var(--hero-scrim), transparent) 0%, transparent 65%),
+    linear-gradient(to top, color-mix(in srgb, var(--color-bg-dark) var(--hero-scrim), transparent) 0%, transparent 100%);
+}
+
+.hero .hero__content {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: var(--gap-title-body);
+  padding-block: var(--spacing-3xl) var(--layout-section-padding);
+}
+
+.hero .hero__title {
+  font-family: var(--font-family-display);
+  max-width: 16ch;
+  font-size: var(--text-display-xl); /* un escalón más: la display condensada ocupa menos */
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.hero .hero__info {
+  font-size: var(--text-body-lg);
+  font-weight: var(--btn-font-weight);
+}
+
+.hero .hero__lead {
+  max-width: var(--measure);
+  color: var(--color-text-inverse);
+  font-size: var(--text-body-lg);
+}
+
+.hero .hero__actions {
+  margin-top: calc(var(--gap-body-cta) - var(--gap-title-body));
+}
+
+/* Abajo a la derecha: arriba a la derecha va el selector de idioma */
+.hero .hero__toggle {
+  position: absolute;
+  bottom: var(--spacing-md);
+  right: var(--layout-margin);
+  min-height: var(--btn-height-sm);
+  padding: var(--spacing-xs) var(--spacing-base);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-inverse);
+  font-size: var(--text-small);
+  cursor: pointer;
 }
