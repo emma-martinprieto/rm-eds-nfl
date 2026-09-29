@@ -49,7 +49,10 @@ function buildCalButton(cfg) {
   const hidden = document.createElement('span');
   hidden.className = 'visually-hidden';
   hidden.textContent = ': añadir el NFL Madrid Game a tu calendario';
-  cal.append(icon('calendar', 'icon'), 'Recuérdamelo', hidden);
+  const label = document.createElement('span');
+  label.className = 'event-bar__cal-label';
+  label.textContent = 'Recuérdamelo';
+  cal.append(icon('calendar', 'icon'), label, hidden);
   return cal;
 }
 

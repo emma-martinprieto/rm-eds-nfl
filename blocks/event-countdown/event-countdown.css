@@ -73,3 +73,16 @@
   letter-spacing: normal;
   text-transform: none;
 }
+
+/* Móvil (Figma): solo el icono de calendario. El texto sigue en el nombre
+   accesible del botón (oculto a la vista, como .visually-hidden) */
+@media (max-width: 767px) { /* < --breakpoint-tablet */
+  .event-countdown .event-bar__cal-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
