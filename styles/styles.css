@@ -382,10 +382,7 @@ a {
    applies only to Experiencias, Planes, Noticias, Entradas and FAQ.
    ═══════════════════════════════════════════════════════ */
 
-/* = .section L202-204 */
-main > .section {
-  padding-block: var(--layout-section-padding);
-}
+
 
 main > .section.hero-container,
 main > .section.event-countdown-container,
