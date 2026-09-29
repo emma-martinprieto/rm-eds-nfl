@@ -58,7 +58,7 @@
   display: grid;
   justify-items: start;
   gap: var(--gap-title-body);
-  padding-block: var(--spacing-3xl) var(--layout-section-padding);
+  padding-block: var(--spacing-3xl) var(--section-padding);
 }
 
 .hero .hero__title {

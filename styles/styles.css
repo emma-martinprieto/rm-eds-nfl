@@ -231,7 +231,8 @@
   --xp-media-ratio:     16 / 9;  /* imagen de las tarjetas de Experiencias */
   --xp-glass:           64%;    /* opacidad del panel de fecha sobre la foto: AA con blanco sobre cualquier foto */
   --match-crest-width:  40%;    /* escudos «Bengals vs Falcons» sobre la foto de la tarjeta de entradas */
-  --hospitality-helmet: clamp(88px, 10vw, 152px); /* cascos que sobresalen del banner Hospitality */
+  --hospitality-helmet-max: 152px; /* tamaño de los cascos en el Figma de escritorio */
+  --hospitality-helmet: clamp(88px, 10vw, var(--hospitality-helmet-max)); /* cascos que sobresalen del banner Hospitality */
   --hospitality-min-height: 360px; /* alto mínimo del banner Hospitality en escritorio */
 }
 
@@ -337,7 +338,7 @@ a {
   --layout-columns:         var(--grid-columns-mobile);
   --layout-gutter:          var(--grid-gutter-mobile);
   --layout-margin:          var(--grid-margin-mobile);
-  --layout-section-padding: var(--padding-section-mobile);
+  --section-padding:        var(--padding-section-mobile);  /* 64px */
 }
 
 @media (min-width: 768px) { /* --breakpoint-tablet */
@@ -345,7 +346,7 @@ a {
     --layout-columns:         var(--grid-columns-tablet);
     --layout-gutter:          var(--grid-gutter-tablet);
     --layout-margin:          var(--grid-margin-tablet);
-    --layout-section-padding: var(--padding-section-tablet);
+    --section-padding:        var(--padding-section-tablet);  /* 88px */
   }
 }
 
@@ -354,7 +355,7 @@ a {
     --layout-columns:         var(--grid-columns-desktop);
     --layout-gutter:          var(--grid-gutter-desktop);
     --layout-margin:          var(--grid-margin-desktop);
-    --layout-section-padding: var(--padding-section-desktop);
+    --section-padding:        var(--padding-section-desktop); /* 120px */
   }
 }
 
@@ -378,19 +379,36 @@ a {
 
 /* ═══════════════════════════════════════════════════════
    EDS SECTIONS (block-style-spec §2.3)
-   Every EDS section gets `.section`; the prototype's `.section` padding
-   applies only to Experiencias, Planes, Noticias, Entradas and FAQ.
+   The vertical rhythm lives on the section, never on the block:
+   every section gets --section-padding (= prototype .section L200-206).
+   Variants come from section-metadata `Style`:
+   full-bleed (hero, countdown, CTA final), flush-top (Noticias, Entradas),
+   dark (Experiencias), light + split (FAQ).
    ═══════════════════════════════════════════════════════ */
 
+main > .section {
+  margin: 0;
+  padding-block: var(--section-padding);
+}
 
+/* Empty sections (e.g. the one that held the page `metadata` table, which EDS
+   moves to <head>) would otherwise render as a blank band of 2 × padding */
+main > .section:not(:has(> *)) {
+  display: none !important; /* aem.js sets inline display when loading the section */
+}
 
+/* Style: full-bleed — the block draws its own background and inner padding.
+   The *-container classes are a fallback in case the author omits the Style. */
+main > .section.full-bleed,
 main > .section.hero-container,
 main > .section.event-countdown-container,
 main > .section.closing-cta-container {
   padding-block: 0;
 }
 
-/* = .section--flush-top L208-210 */
+/* Style: flush-top = .section--flush-top L208-210.
+   Follows a section with the same white background: the previous
+   section's bottom padding is the only gap (no double padding). */
 main > .section.flush-top {
   padding-top: 0;
 }
@@ -404,6 +422,7 @@ main > .section > div {
 }
 
 /* full-bleed blocks: their JS creates their own inner .container */
+main > .section.full-bleed > div,
 main > .section.hero-container > div,
 main > .section.event-countdown-container > div,
 main > .section.closing-cta-container > div {
@@ -416,6 +435,11 @@ main > .section > .default-content-wrapper {
   display: grid;
   gap: var(--gap-title-body);
   margin-bottom: var(--gap-header-content);
+}
+
+/* A head with nothing after it must not add to the section padding */
+main > .section > .default-content-wrapper:last-child {
+  margin-bottom: 0;
 }
 
 main > .section > .default-content-wrapper h2 {
@@ -442,6 +466,26 @@ main > .section.dark {
 
 main > .section.dark > .default-content-wrapper h2 {
   color: var(--color-text-inverse);
+}
+
+/* Section-metadata `Background` (image or URL) → --section-bg-image (scripts.js).
+   Uniform dark layer, like the CTA final scrim but even, because the header
+   and filter sit at the top and the cards cover the rest.
+   75 %: minimum that keeps --color-text-inverse-muted at AA (≈5:1) even over
+   a pure white pixel. If the image or the text colours change, re-measure. */
+main > .section.has-background {
+  --section-bg-scrim: 75%;
+
+  background-color: var(--color-bg-dark);
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-bg-dark) var(--section-bg-scrim), transparent),
+      color-mix(in srgb, var(--color-bg-dark) var(--section-bg-scrim), transparent)
+    ),
+    var(--section-bg-image);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 /* Style: light = .faq L1589-1591 */

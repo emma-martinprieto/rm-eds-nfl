@@ -44,7 +44,7 @@
   display: grid;
   justify-items: center;
   gap: var(--gap-title-body);
-  padding-block: var(--layout-section-padding);
+  padding-block: var(--section-padding);
 }
 
 .closing-cta .final-cta__title {
@@ -109,12 +109,12 @@
    (junto al título centrado no hay hueco) */
 @media (max-width: 1023px) { /* < --breakpoint-desktop */
   .closing-cta .final-cta__inner {
-    padding-bottom: calc(var(--layout-section-padding) + var(--spacing-3xl));
+    padding-bottom: calc(var(--section-padding) + var(--spacing-3xl));
   }
 }
 
 @media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
   .closing-cta .final-cta__inner {
-    padding-bottom: var(--layout-section-padding);
+    padding-bottom: var(--section-padding);
   }
 }

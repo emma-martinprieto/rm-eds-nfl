@@ -145,9 +145,32 @@ function decorateButtons(main) {
 }
 
 /**
+ * Resolves the `Background` cell of a section-metadata table to an image URL.
+ * Authors may paste an image (the cell holds a <picture>) or type a URL/path.
+ * @param {Element} cell The value cell
+ * @returns {string} The image URL, or '' if there is none
+ */
+function getBackgroundUrl(cell) {
+  const img = cell.querySelector('img');
+  if (img) {
+    // EDS media: ask the image service for a width that covers a full-bleed section
+    const url = new URL(img.getAttribute('src'), window.location.href);
+    if (url.pathname.includes('/media_')) {
+      url.searchParams.set('width', '2000');
+      url.searchParams.set('format', 'webply');
+      url.searchParams.set('optimize', 'medium');
+    }
+    return url.href;
+  }
+  const link = cell.querySelector('a');
+  return (link ? link.href : cell.textContent).trim();
+}
+
+/**
  * Applies section-metadata tables (this aem.js does not read them):
- * `Style` values become section classes (dark, flush-top, light, split),
+ * `Style` values become section classes (dark, full-bleed, flush-top, light, split),
  * `Id` becomes the section id (anchors #experiencias, #madridista…),
+ * `Background` (image or URL) becomes data-background + --section-bg-image,
  * any other key becomes a data attribute. The table is then removed.
  * @param {Element} main The main element
  */
@@ -158,6 +181,14 @@ function decorateSectionMetadata(main) {
       const [keyCell, valueCell] = row.children;
       if (!keyCell || !valueCell) return;
       const key = toClassName(keyCell.textContent);
+      if (key === 'background') {
+        const url = getBackgroundUrl(valueCell);
+        if (!url) return;
+        section.dataset.background = url;
+        section.style.setProperty('--section-bg-image', `url("${url.replace(/"/g, '%22')}")`);
+        section.classList.add('has-background');
+        return;
+      }
       const value = valueCell.textContent.trim();
       if (!key || !value) return;
       if (key === 'style') {
@@ -194,6 +225,8 @@ export function decorateMain(main) {
  */
 async function loadScrollBall() {
   if (document.querySelector('.ball-layer')) return;
+  // prefers-reduced-motion: the ball never shows, so don't even download it
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const layer = document.createElement('div');
   layer.className = 'ball-layer';
   layer.setAttribute('aria-hidden', 'true');

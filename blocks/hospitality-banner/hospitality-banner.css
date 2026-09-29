@@ -107,9 +107,12 @@
 
 /* Escritorio: texto a la izquierda; la foto ocupa la mitad derecha y se funde hacia la izquierda */
 @media (min-width: 1024px) { /* --breakpoint-desktop */
+  /* Hueco fijo de Figma (108px): gutter wide + medio casco a su tamaño máximo,
+     así los cascos tienen sitio a cualquier ancho de escritorio */
   .hospitality-banner .hospitality {
     grid-template-columns: 1fr 1fr;
     min-height: var(--hospitality-min-height);
+    margin-top: calc(var(--grid-gutter-wide) + var(--hospitality-helmet-max) / 2);
   }
 
   .hospitality-banner .hospitality__media {
