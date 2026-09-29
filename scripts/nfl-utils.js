@@ -189,41 +189,130 @@ function slug(text) {
     .replace(/^-|-$/g, '');
 }
 
-function download(el) {
+const DEFAULT_TITLE = 'NFL Madrid Game';
+const DEFAULT_DURATION = 3 * 60 * 60 * 1000; // sin fin informado: 3 h
+
+/** Reads the event from the data-ics-* attributes, with safe defaults. */
+function readEvent(el) {
   const allDay = el.hasAttribute('data-ics-allday');
-  const prop = allDay ? ';VALUE=DATE:' : ':';
-  const title = el.getAttribute('data-ics-title');
+  const start = el.getAttribute('data-ics-start');
+  let end = el.getAttribute('data-ics-end');
+  if (!end && !allDay) end = new Date(new Date(start).getTime() + DEFAULT_DURATION).toISOString();
+  return {
+    allDay,
+    start,
+    end: end || start,
+    title: el.getAttribute('data-ics-title') || DEFAULT_TITLE,
+    description: el.getAttribute('data-ics-description') || '',
+    location: el.getAttribute('data-ics-location') || '',
+  };
+}
+
+function buildIcs(ev) {
+  const prop = ev.allDay ? ';VALUE=DATE:' : ':';
   const lines = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Real Madrid//NFL Madrid Game//ES', 'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
-    `UID:${slug(title)}-${el.getAttribute('data-ics-start').slice(0, 10)}@nfl-madrid-game`,
+    `UID:${slug(ev.title)}-${ev.start.slice(0, 10)}@nfl-madrid-game`,
     `DTSTAMP:${icsDate(new Date().toISOString(), false)}`,
-    `DTSTART${prop}${icsDate(el.getAttribute('data-ics-start'), allDay)}`,
-    `DTEND${prop}${icsDate(el.getAttribute('data-ics-end'), allDay)}`,
-    `SUMMARY:${esc(title)}`,
+    `DTSTART${prop}${icsDate(ev.start, ev.allDay)}`,
+    `DTEND${prop}${icsDate(ev.end, ev.allDay)}`,
+    `SUMMARY:${esc(ev.title)}`,
   ];
-  const desc = el.getAttribute('data-ics-description');
-  if (desc) lines.push(`DESCRIPTION:${esc(desc)}`);
-  if (el.getAttribute('data-ics-location')) lines.push(`LOCATION:${esc(el.getAttribute('data-ics-location'))}`);
+  if (ev.description) lines.push(`DESCRIPTION:${esc(ev.description)}`);
+  if (ev.location) lines.push(`LOCATION:${esc(ev.location)}`);
   // Aviso un día antes
   lines.push(
     'BEGIN:VALARM',
     'ACTION:DISPLAY',
     'TRIGGER:-P1D',
-    `DESCRIPTION:${esc(title)}`,
+    `DESCRIPTION:${esc(ev.title)}`,
     'END:VALARM',
     'END:VEVENT',
     'END:VCALENDAR',
   );
+  return lines.join('\r\n');
+}
 
-  const url = URL.createObjectURL(new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' }));
+/** Google Calendar «añadir evento» con los datos rellenos (Android no importa .ics). */
+function googleUrl(ev) {
+  const url = new URL('https://calendar.google.com/calendar/render');
+  url.searchParams.set('action', 'TEMPLATE');
+  url.searchParams.set('text', ev.title);
+  url.searchParams.set('dates', `${icsDate(ev.start, ev.allDay)}/${icsDate(ev.end, ev.allDay)}`);
+  if (ev.description) url.searchParams.set('details', ev.description);
+  if (ev.location) url.searchParams.set('location', ev.location);
+  url.searchParams.set('ctz', 'Europe/Madrid');
+  return url.href;
+}
+
+/** Outlook web «nuevo evento» con los datos rellenos. host: outlook.live.com (personal)
+    u outlook.office.com (Microsoft 365, cuentas de trabajo). */
+function outlookUrl(ev, host) {
+  const url = new URL(`https://${host}/calendar/0/action/compose`);
+  url.searchParams.set('path', '/calendar/action/compose');
+  url.searchParams.set('rru', 'addevent');
+  url.searchParams.set('subject', ev.title);
+  url.searchParams.set('startdt', new Date(ev.start).toISOString());
+  url.searchParams.set('enddt', new Date(ev.end).toISOString());
+  url.searchParams.set('allday', String(ev.allDay));
+  if (ev.description) url.searchParams.set('body', ev.description);
+  if (ev.location) url.searchParams.set('location', ev.location);
+  return url.href;
+}
+
+function platform() {
+  const ua = navigator.userAgent;
+  if (/Android/i.test(ua)) return 'android';
+  // iPadOS se identifica como Mac: se distingue por la pantalla táctil
+  if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'ios';
+  return 'desktop';
+}
+
+/** Descarga del .ics (Outlook de escritorio, Apple Calendar, Thunderbird…). */
+function downloadIcs(el) {
+  const ev = readEvent(el);
+  if (!ev.start) return;
+  const url = URL.createObjectURL(new Blob([buildIcs(ev)], { type: 'text/calendar;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
-  a.download = `nfl-madrid-game-${slug(title.split(' · ')[0])}.ics`;
+  a.download = `nfl-madrid-game-${slug(ev.title.split(' · ')[0])}.ics`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => { URL.revokeObjectURL(url); }, 1000);
 }
 
-export const nflCalendar = { download };
+/**
+ * Móvil: acción directa, la que mejor funciona en cada sistema.
+ * - Android: formulario de Google Calendar (su app no importa .ics).
+ * - iOS: se navega al .ics sin descargarlo → hoja del sistema «Añadir al calendario».
+ * @returns {boolean} false en escritorio: ahí el usuario elige en un menú (links())
+ */
+function addDirect(el) {
+  const ev = readEvent(el);
+  if (!ev.start) return true;
+  const target = platform();
+  if (target === 'android') {
+    window.open(googleUrl(ev), '_blank', 'noopener');
+    return true;
+  }
+  if (target === 'ios') {
+    window.location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(buildIcs(ev))}`;
+    return true;
+  }
+  return false;
+}
+
+/** Enlaces «añadir evento» de los calendarios web (menú de escritorio). */
+function links(el) {
+  const ev = readEvent(el);
+  if (!ev.start) return null;
+  return {
+    google: googleUrl(ev),
+    outlook: outlookUrl(ev, 'outlook.live.com'),
+    office: outlookUrl(ev, 'outlook.office.com'),
+  };
+}
+
+export const nflCalendar = { addDirect, links, downloadIcs };

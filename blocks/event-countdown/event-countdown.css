@@ -74,6 +74,50 @@
   text-transform: none;
 }
 
+/* Escritorio: menú para elegir calendario, bajo el botón y alineado a su derecha */
+.event-countdown .event-bar__cal-wrap {
+  position: relative;
+}
+
+.event-countdown .event-bar__cal-menu {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  right: 0;
+  z-index: 6; /* por encima de la capa del balón (5) */
+  display: grid;
+  gap: var(--spacing-2xs);
+  min-width: max-content;
+  margin: 0;
+  padding: var(--spacing-xs);
+  border: var(--border-width) solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+  border-radius: var(--radius-md);
+  background-color: var(--color-off-black);
+  box-shadow: var(--btn-primary-shadow);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.event-countdown .event-bar__cal-menu a,
+.event-countdown .event-bar__cal-menu button {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-inverse);
+  font-size: var(--text-small);
+  font-weight: var(--btn-font-weight);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.event-countdown .event-bar__cal-menu a:hover,
+.event-countdown .event-bar__cal-menu button:hover {
+  background-color: color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+}
+
 /* Móvil (Figma): solo el icono de calendario. El texto sigue en el nombre
    accesible del botón (oculto a la vista, como .visually-hidden) */
 @media (max-width: 767px) { /* < --breakpoint-tablet */

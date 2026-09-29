@@ -36,7 +36,7 @@ function buildCountdown(target) {
   return box;
 }
 
-function buildCalButton(cfg) {
+function buildCalButton(cfg, target) {
   const cal = document.createElement('button');
   cal.className = 'btn btn--inverse btn--sm event-bar__cal';
   cal.type = 'button';
@@ -45,6 +45,8 @@ function buildCalButton(cfg) {
     const v = cfg[`ics-${k}`];
     if (v) cal.setAttribute(`data-ics-${k}`, v);
   });
+  // Sin fila «ICS Start», el evento empieza en la fecha de la cuenta atrás
+  if (!cal.hasAttribute('data-ics-start') && target) cal.setAttribute('data-ics-start', target);
   if (cfg['ics-allday']) cal.setAttribute('data-ics-allday', '');
   const hidden = document.createElement('span');
   hidden.className = 'visually-hidden';
@@ -53,7 +55,82 @@ function buildCalButton(cfg) {
   label.className = 'event-bar__cal-label';
   label.textContent = 'Recuérdamelo';
   cal.append(icon('calendar', 'icon'), label, hidden);
-  return cal;
+  const wrap = document.createElement('div');
+  wrap.className = 'event-bar__cal-wrap';
+  wrap.append(cal);
+  return wrap;
+}
+
+/* Escritorio: menú para elegir calendario (la web no sabe cuál usa cada persona).
+   Patrón «disclosure»: botón con aria-expanded + lista de enlaces. */
+const CAL_OPTIONS = [
+  ['google', 'Google Calendar'],
+  ['outlook', 'Outlook.com'],
+  ['office', 'Outlook (Microsoft 365)'],
+];
+
+function buildCalMenu(cal, urls) {
+  const menu = document.createElement('ul');
+  menu.className = 'event-bar__cal-menu';
+  menu.id = 'event-bar-cal-menu';
+  menu.setAttribute('role', 'list');
+  menu.hidden = true;
+  CAL_OPTIONS.forEach(([key, text]) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = urls[key];
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = text;
+    const hint = document.createElement('span');
+    hint.className = 'visually-hidden';
+    hint.textContent = ' (se abre en una pestaña nueva)';
+    a.append(hint);
+    li.append(a);
+    menu.append(li);
+  });
+  const li = document.createElement('li');
+  const ics = document.createElement('button');
+  ics.type = 'button';
+  ics.textContent = 'Apple Calendar u otro (.ics)';
+  ics.addEventListener('click', () => nflCalendar.downloadIcs(cal));
+  li.append(ics);
+  menu.append(li);
+  cal.setAttribute('aria-controls', menu.id);
+  cal.setAttribute('aria-expanded', 'false');
+  return menu;
+}
+
+function initCalMenu(cal) {
+  let menu;
+  const wrap = cal.parentElement;
+
+  function setOpen(open, { focusButton = false } = {}) {
+    if (!menu) return;
+    menu.hidden = !open;
+    cal.setAttribute('aria-expanded', String(open));
+    if (focusButton) cal.focus();
+  }
+
+  cal.addEventListener('click', () => {
+    if (nflCalendar.addDirect(cal)) return; // móvil: acción directa
+    if (!menu) {
+      const urls = nflCalendar.links(cal);
+      if (!urls) return;
+      menu = buildCalMenu(cal, urls);
+      wrap.append(menu);
+      menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
+    }
+    const open = menu.hidden;
+    setOpen(open);
+    if (open) menu.querySelector('a').focus();
+  });
+
+  wrap.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu && !menu.hidden) setOpen(false, { focusButton: true });
+  });
+  document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) setOpen(false); });
+  wrap.addEventListener('focusout', (e) => { if (!wrap.contains(e.relatedTarget)) setOpen(false); });
 }
 
 /* ─── Recordatorio — script.js L113-127 ─── */
@@ -66,7 +143,7 @@ function initReminder(block) {
   const cal = block.querySelector('.event-bar__cal');
   if (cal) {
     cal.hidden = false;
-    cal.addEventListener('click', () => { nflCalendar.download(cal); });
+    initCalMenu(cal);
   }
   // La fecha ya está en el hero: con cuenta atrás activa, la barra no la repite
   const fallback = block.querySelector('[data-fallback]');
@@ -140,7 +217,7 @@ export default function decorate(block) {
   inner.className = 'event-bar__inner container';
   if (cfg.date) inner.append(buildDate(cfg.date.trim(), target));
   if (target) inner.append(buildCountdown(target));
-  inner.append(buildCalButton(cfg));
+  inner.append(buildCalButton(cfg, target));
 
   block.replaceChildren(inner);
   block.setAttribute('aria-label', 'Cuenta atrás del evento');
