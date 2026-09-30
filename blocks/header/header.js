@@ -46,15 +46,30 @@ export default async function decorate(block) {
   const lang = document.createElement('nav');
   lang.className = 'lang-switch';
   lang.setAttribute('aria-label', 'Idioma');
-  [...fragment.querySelectorAll('li a')].forEach((a, i) => {
+  const setCurrent = (current) => {
+    lang.querySelectorAll('.lang-switch__item').forEach((el) => {
+      if (el === current) el.setAttribute('aria-current', 'page');
+      else el.removeAttribute('aria-current');
+    });
+  };
+  [...fragment.querySelectorAll('li a')].forEach((a) => {
     const code = a.textContent.trim();
     const iso = code.toLowerCase();
+    const href = a.getAttribute('href') || '#';
     const item = document.createElement('a');
     item.className = 'lang-switch__item';
-    item.href = a.getAttribute('href');
+    item.href = href;
     item.lang = iso;
     item.hreflang = iso;
-    if (i === 0) item.setAttribute('aria-current', 'page');
+    // links without a real target yet: toggle the active state in place
+    if (href.startsWith('#')) {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCurrent(item);
+      });
+    } else if (new URL(href, window.location).pathname === window.location.pathname) {
+      item.setAttribute('aria-current', 'page');
+    }
     item.textContent = code;
     if (LANG_NAMES[iso]) {
       const hidden = document.createElement('span');
@@ -64,6 +79,7 @@ export default async function decorate(block) {
     }
     lang.append(item);
   });
+  if (!lang.querySelector('[aria-current]')) setCurrent(lang.querySelector('.lang-switch__item'));
 
   inner.append(logos, lang);
   block.append(inner);
