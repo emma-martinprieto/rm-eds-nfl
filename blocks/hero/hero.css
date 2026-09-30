@@ -100,3 +100,17 @@
   font-size: var(--text-small);
   cursor: pointer;
 }
+
+/* Móvil: sin botón de pausa */
+@media (max-width: 767px) { /* < --breakpoint-tablet */
+  .hero .hero__toggle {
+    display: none;
+  }
+}
+
+/* Tablet y escritorio (Figma): el título en una sola línea */
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .hero .hero__title {
+    max-width: none;
+  }
+}

@@ -121,6 +121,40 @@
 /* Móvil (Figma): solo el icono de calendario. El texto sigue en el nombre
    accesible del botón (oculto a la vista, como .visually-hidden) */
 @media (max-width: 767px) { /* < --breakpoint-tablet */
+  /* Figma móvil: «Faltan», las tres cajas y el calendario en una sola fila */
+  .event-countdown .event-bar__inner {
+    flex-wrap: nowrap;
+    gap: var(--spacing-base);
+  }
+
+  .event-countdown .countdown {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .event-countdown .countdown__units {
+    flex: 1;
+    gap: var(--spacing-sm);
+  }
+
+  .event-countdown .countdown__unit {
+    flex: 1;
+    min-width: 0;
+    max-width: var(--btn-height-lg);
+    padding-inline: 0;
+  }
+
+  /* Figma móvil: unidades en minúscula, sin negrita */
+  .event-countdown .countdown__label {
+    font-weight: normal;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .event-countdown .event-bar__cal-wrap {
+    flex-shrink: 0;
+  }
+
   .event-countdown .event-bar__cal-label {
     position: absolute;
     width: 1px;

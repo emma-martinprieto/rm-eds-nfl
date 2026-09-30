@@ -63,17 +63,18 @@ header .lang-switch__item[aria-current] {
 header .site-header__logos {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-md); /* Figma: 24 */
 }
 
 header .site-header__logo {
   width: auto;
 }
 
-/* Mismo peso visual: el escudo NFL es estrecho y el logotipo Bernabéu muy ancho,
-   así que el logotipo va bajo para ocupar una superficie parecida */
+/* Figma: logotipo Bernabéu 78×42 y escudo NFL de 56 de alto (≈41 de ancho) */
 header .site-header__logo--bernabeu {
-  height: var(--spacing-base);
+  width: 78px;
+  height: 42px;
+  object-fit: contain;
 }
 
 header .site-header__logo--nfl {
