@@ -2,6 +2,16 @@
  * NFL Madrid Game 2026 — shared helpers for the blocks.
  * nflCalendar is a port of the prototype's js/script.js L17-67 (same .ics output).
  */
+import { t, localize } from './placeholders.js';
+
+/** « (se abre en una pestaña nueva)», oculto: enlaces que abren otra pestaña.
+    Se actualiza solo si la hoja llega después (botones del hero). */
+export function newTabHint() {
+  const hint = document.createElement('span');
+  hint.className = 'visually-hidden';
+  localize(() => { hint.textContent = ` (${t('link-new-tab', 'se abre en una pestaña nueva')})`; });
+  return hint;
+}
 
 /* ─── Authoring helpers ─────────────────────────────────── */
 
@@ -32,10 +42,7 @@ export function externalize(a) {
   if (url.hostname && url.hostname !== window.location.hostname) {
     a.target = '_blank';
     a.rel = 'noopener';
-    const hint = document.createElement('span');
-    hint.className = 'visually-hidden';
-    hint.textContent = ' (se abre en una pestaña nueva)';
-    a.append(hint);
+    a.append(newTabHint());
   }
   return a;
 }
@@ -115,6 +122,10 @@ export function ensureId(el, fallback) {
 const MONTHS = {
   ene: 1, feb: 2, mar: 3, abr: 4, may: 5, jun: 6, jul: 7, ago: 8, sep: 9, oct: 10, nov: 11, dic: 12,
 };
+// /en/: las abreviaturas inglesas que no coinciden con las españolas
+Object.assign(MONTHS, {
+  jan: 1, apr: 4, aug: 8, dec: 12,
+});
 
 const pad2 = (n) => String(n).padStart(2, '0');
 
@@ -147,9 +158,9 @@ export function parseEsDate(text) {
   const day = parseInt(m[1], 10);
   const year = parseInt(m[3], 10);
   const date = `${year}-${pad2(month)}-${pad2(day)}`;
-  const t = /(\d{1,2}):(\d{2})\s*h/i.exec(text.slice(m.index + m[0].length));
-  if (!t) return date;
-  return `${date}T${pad2(parseInt(t[1], 10))}:${t[2]}${madridOffset(year, month, day)}`;
+  const hm = /(\d{1,2}):(\d{2})\s*h/i.exec(text.slice(m.index + m[0].length));
+  if (!hm) return date;
+  return `${date}T${pad2(parseInt(hm[1], 10))}:${hm[2]}${madridOffset(year, month, day)}`;
 }
 
 /**

@@ -18,32 +18,32 @@
 .hero .hero__media {
   position: absolute;
   inset: 0;
+  overflow: hidden;
 }
 
+/* scale: el teaser «We are ready» trae un marco negro fino (tipo cine);
+   ampliándolo un poco queda fuera del hero */
 .hero .hero__video {
   width: 100%;
   height: 100%;
   max-width: none;
   object-fit: cover;
+  transform: scale(1.04);
 }
 
-/* Capa de oscurecimiento: solo detrás del texto (abajo e izquierda),
-   el resto del vídeo queda limpio. Intensidad ajustada al mínimo que
-   mantiene AA midiendo el contraste sobre los fotogramas del vídeo. */
+/* Capa de oscurecimiento. Intensidad ajustada al mínimo que mantiene AA
+   (texto 4,5:1, H1 3:1) medido durante los 19 s del teaser en cada tamaño.
+   Si cambian el vídeo, la tipografía o los textos, hay que volver a medir. */
 .hero.block {
-  /* Mínimo medido para AA (texto 4,5:1, H1 3:1) sobre 21 fotogramas del vídeo.
-     Si cambian el vídeo, la tipografía o los textos, hay que volver a medir. */
-  --hero-scrim: 45%;                /* móvil */
-}
-
-@media (min-width: 768px) {         /* --breakpoint-tablet */
-  .hero.block { --hero-scrim: 25%; }
+  --hero-scrim: 60%;                /* tablet: título 3,5:1 · textos 8,2:1 */
 }
 
 @media (min-width: 1024px) {        /* --breakpoint-desktop */
-  .hero.block { --hero-scrim: 35%; }
+  .hero.block { --hero-scrim: 35%; } /* título 3,2:1 · textos 5,3:1 */
 }
 
+/* Tablet y escritorio: solo detrás del texto (abajo e izquierda),
+   el resto del vídeo queda limpio */
 .hero .hero__media::after {
   content: "";
   position: absolute;
@@ -51,6 +51,14 @@
   background:
     linear-gradient(to right, color-mix(in srgb, var(--color-bg-dark) var(--hero-scrim), transparent) 0%, transparent 65%),
     linear-gradient(to top, color-mix(in srgb, var(--color-bg-dark) var(--hero-scrim), transparent) 0%, transparent 100%);
+}
+
+/* Móvil: el texto ocupa todo el ancho y el degradado no lo cubre,
+   así que la capa es uniforme (título 3,7:1 · textos 5,8:1) */
+@media (max-width: 767px) {         /* < --breakpoint-tablet */
+  .hero .hero__media::after {
+    background: color-mix(in srgb, var(--color-bg-dark) 50%, transparent);
+  }
 }
 
 .hero .hero__content {
@@ -86,31 +94,10 @@
   margin-top: calc(var(--gap-body-cta) - var(--gap-title-body));
 }
 
-/* Abajo a la derecha: arriba a la derecha va el selector de idioma */
-.hero .hero__toggle {
-  position: absolute;
-  bottom: var(--spacing-md);
-  right: var(--layout-margin);
-  min-height: var(--btn-height-sm);
-  padding: var(--spacing-xs) var(--spacing-base);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background-color: var(--color-bg-dark);
-  color: var(--color-text-inverse);
-  font-size: var(--text-small);
-  cursor: pointer;
-}
-
-/* Móvil: sin botón de pausa */
-@media (max-width: 767px) { /* < --breakpoint-tablet */
-  .hero .hero__toggle {
-    display: none;
-  }
-}
-
-/* Tablet y escritorio (Figma): el título en una sola línea */
+/* Tablet y escritorio (Figma): el título en dos líneas, ancho 680px */
 @media (min-width: 768px) { /* --breakpoint-tablet */
   .hero .hero__title {
-    max-width: none;
+    max-width: 680px;
+    text-wrap: balance;
   }
 }

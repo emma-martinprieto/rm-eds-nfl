@@ -33,8 +33,9 @@ footer .site-footer__logo--game {
   height: var(--spacing-2xl);
 }
 
+/* Figma: 89,14 × 48, centrado en la fila de 64 del escudo (8 arriba y abajo) */
 footer .site-footer__logo--bernabeu {
-  height: var(--spacing-base);
+  height: var(--spacing-xl);
 }
 
 footer .site-footer__logo--madridistas {

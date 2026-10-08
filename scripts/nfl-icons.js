@@ -8,6 +8,7 @@ const PATHS = {
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   'chevron-right': '<path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>',
   'chevron-left': '<path d="M14 6l1.41 1.41L10.83 12l4.58 4.59L14 18l-6-6z" fill="currentColor"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   'chevron-down': '<path d="M16.64 9.68 12 14.32 7.36 9.68" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 

@@ -1,0 +1,82 @@
+/* Table: tarjeta con borde fino y radio lg; cabecera sobre fondo claro; primera columna
+   (cabecera de fila) en negrita; separador fino solo entre filas. Igual en el lightbox de
+   noticias y en la página de la noticia (ningún selector depende de main).
+   El borde y el radio van en el contenedor con scroll, no en la tabla: en móvil la tabla
+   se desplaza dentro y las esquinas siguen recortadas. */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation */
+
+.table {
+  --table-first-col: 30%; /* PROPUESTO (README · Valores propuestos): ancho de la 1.ª columna */
+}
+
+.table .table__scroll {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-line);
+  border-radius: var(--radius-lg);
+}
+
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+  line-height: var(--lh-small);
+}
+
+.table th,
+.table td {
+  padding: var(--spacing-base) var(--spacing-md);
+  text-align: left;
+  vertical-align: top;
+}
+
+/* Cabecera: fondo claro, negrita, color de título */
+.table thead th {
+  background-color: var(--color-surface-light);
+  color: var(--color-text-title);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Primera columna (th scope="row"): negrita, color de título y más ancha */
+.table tbody th {
+  color: var(--color-text-title);
+  font-weight: var(--font-weight-bold);
+}
+
+.table tr > :first-child {
+  width: var(--table-first-col);
+}
+
+/* Resto de celdas: color del cuerpo del artículo */
+.table td {
+  color: var(--color-text-body);
+}
+
+/* Separador fino solo entre filas (también entre la cabecera y la primera fila);
+   ni bajo la última ni vertical */
+.table tbody tr > * {
+  border-top: var(--border-width) solid var(--color-line);
+}
+
+.table table:not(:has(thead)) tbody tr:first-child > * {
+  border-top: 0;
+}
+
+.table :is(th, td) > :first-child {
+  margin-top: 0;
+}
+
+/* 3 columnas o más: nunca más estrecha que en el panel del lightbox (720 − 2 × relleno
+   − el borde del contenedor). En móvil no se aplasta en columnas de una palabra: se
+   desplaza dentro del borde. */
+.table table:has(tr > :nth-child(3)) {
+  min-width: calc(var(--lightbox-width) - 2 * var(--padding-card) - 2 * var(--border-width));
+}
+
+/* Con 3 columnas o más, la última (precios: «Desde 12,90 € / mes») no se parte; la
+   central se lleva el resto. Con 2 columnas no: ahí la última lleva texto largo.
+   Web y tablet (el panel del lightbox mide lo mismo); en móvil sí puede partirse. */
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .table table:has(tr > :nth-child(3)) tr > :last-child {
+    white-space: nowrap;
+  }
+}

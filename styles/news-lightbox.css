@@ -1,0 +1,178 @@
+/* Lightbox de noticias (scripts/news-lightbox.js). El artículo: styles/news-article.css.
+   Web y tablet: panel centrado sobre la página oscurecida, scroll dentro del panel.
+   Móvil: a pantalla completa. */
+/* stylelint-disable selector-class-pattern, media-feature-range-notation */
+
+/* La página de detrás no hace scroll mientras está abierto */
+html.news-lightbox-open {
+  overflow: hidden;
+}
+
+.news-lightbox {
+  width: min(var(--lightbox-width), 100% - 2 * var(--layout-margin));
+  max-width: none;
+  max-height: var(--lightbox-max-height);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-bg-light);
+  box-shadow: var(--shadow-dialog);
+  color: var(--color-text-body);
+  overflow: hidden;
+}
+
+.news-lightbox[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ::backdrop no hereda las variables en todos los navegadores: valores de reserva = tokens */
+.news-lightbox::backdrop {
+  background-color: color-mix(in srgb, var(--color-bg-dark, #0A0A0A) var(--lightbox-backdrop, 72%), transparent);
+}
+
+/* Scroll sin barra visible: en Windows la barra ocupa hueco y deja una franja blanca
+   junto a la foto. Se sigue desplazando con rueda, dedo y teclado (el panel recibe el
+   foco al abrir: flechas, AvPág, Espacio). */
+.news-lightbox__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.news-lightbox__panel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Recibe el foco al abrir (lectores de pantalla y teclado) sin marco visible */
+.news-lightbox__panel:focus {
+  outline: none;
+}
+
+/* X arriba a la derecha, sobre la foto y fija al hacer scroll (barra de alto 0) */
+.news-lightbox__bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+}
+
+.news-lightbox__close {
+  flex: none;
+  margin: var(--spacing-base) var(--spacing-base) 0 0;
+}
+
+/* Móvil: foto con margen lateral y radio lg; debajo, el texto */
+.news-lightbox .news-article {
+  padding: var(--layout-margin) var(--layout-margin) 0;
+}
+
+/* «Cerrar» al final: enlace de texto gris, subrayado, a la derecha */
+.news-lightbox__foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-lg) var(--layout-margin) var(--layout-margin);
+}
+
+.news-lightbox__done {
+  padding: var(--spacing-xs) 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  font-weight: var(--btn-font-weight);
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-2xs);
+  cursor: pointer;
+  transition: color var(--hover-duration) ease;
+}
+
+.news-lightbox__done:hover {
+  color: var(--color-text-title);
+}
+
+@media (max-width: 767px) { /* por debajo de --breakpoint-tablet */
+  .news-lightbox {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* Web y tablet: foto 16:9 a sangre arriba, con la X encima */
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .news-lightbox .news-article {
+    padding: 0 var(--padding-card);
+  }
+
+  .news-lightbox__foot {
+    padding: var(--spacing-lg) var(--padding-card) var(--padding-card);
+  }
+
+  .news-lightbox .news-article:not(:has(.news-article__media)) {
+    padding-top: var(--padding-card);
+  }
+
+  .news-lightbox .news-article .news-article__media {
+    margin-inline: calc(var(--padding-card) * -1);
+  }
+
+  /* Sin radio propio: las esquinas superiores las recorta el radio del panel.
+     Un nivel más de especificidad que news-article.css, que se carga después. */
+  .news-lightbox .news-article .news-article__media img {
+    border-radius: 0;
+  }
+}
+
+/* Abrir: fondo y panel en --lightbox-in (el panel sube --spacing-md).
+   Cerrar (.is-closing, la quita el JS al terminar): al revés, en --lightbox-out. */
+@media (prefers-reduced-motion: no-preference) {
+  .news-lightbox[open] {
+    animation: news-lightbox-in var(--lightbox-in) ease-out;
+  }
+
+  .news-lightbox[open]::backdrop {
+    animation: news-lightbox-fade-in var(--lightbox-in, 0.3s) ease-out;
+  }
+
+  .news-lightbox.is-closing {
+    animation: news-lightbox-out var(--lightbox-out) ease-in forwards;
+  }
+
+  .news-lightbox.is-closing::backdrop {
+    animation: news-lightbox-fade-out var(--lightbox-out, 0.2s) ease-in forwards;
+  }
+}
+
+@keyframes news-lightbox-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-md));
+  }
+}
+
+@keyframes news-lightbox-out {
+  to {
+    opacity: 0;
+    transform: translateY(var(--spacing-md));
+  }
+}
+
+@keyframes news-lightbox-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes news-lightbox-fade-out {
+  to {
+    opacity: 0;
+  }
+}

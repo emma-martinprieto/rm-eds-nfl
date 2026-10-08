@@ -1,12 +1,20 @@
 import { readBlockConfig } from '../../scripts/aem.js';
-import { nflCalendar, timeEl } from '../../scripts/nfl-utils.js';
+import { nflCalendar, timeEl, newTabHint } from '../../scripts/nfl-utils.js';
 import { icon } from '../../scripts/nfl-icons.js';
+import {
+  loadPlaceholders, localize, pageLanguage, pageLocale, t,
+} from '../../scripts/placeholders.js';
 
 /* 02 · Countdown / event bar — prototype index.html L69-89.
    Behaviours: recordatorio (script.js L113-127) and cuenta atrás animada (L134-190).
    The prototype queried `.event-bar …` on the document; here queries are scoped to the block. */
 
-const UNITS = [['days', 'días'], ['hours', 'horas'], ['mins', 'min']];
+// [data-unit, clave de la hoja, texto en español]
+const UNITS = [
+  ['days', 'countdown-days', 'días'],
+  ['hours', 'countdown-hours', 'horas'],
+  ['mins', 'countdown-minutes', 'min'],
+];
 
 function buildDate(text, target) {
   const p = document.createElement('p');
@@ -31,8 +39,15 @@ function buildCountdown(target) {
   box.setAttribute('data-countdown', target);
   box.hidden = true;
   box.innerHTML = `<p class="visually-hidden" data-countdown-label></p>
-    <span class="countdown__lead" aria-hidden="true">Faltan</span>
-    <div class="countdown__units" aria-hidden="true">${UNITS.map(([unit, label]) => `<div class="countdown__unit"><span class="countdown__value" data-unit="${unit}">00</span><span class="countdown__label">${label}</span></div>`).join('')}</div>`;
+    <span class="countdown__lead" aria-hidden="true"></span>
+    <div class="countdown__units" aria-hidden="true">${UNITS.map(([unit]) => `<div class="countdown__unit"><span class="countdown__value" data-unit="${unit}">00</span><span class="countdown__label"></span></div>`).join('')}</div>`;
+  localize(() => {
+    box.querySelector('.countdown__lead').textContent = t('countdown-lead', 'Faltan');
+    box.querySelectorAll('.countdown__label').forEach((label, i) => {
+      const [, key, fallback] = UNITS[i];
+      label.textContent = t(key, fallback);
+    });
+  });
   return box;
 }
 
@@ -49,14 +64,18 @@ function buildCalButton(cfg, target) {
   if (!cal.hasAttribute('data-ics-start') && target) cal.setAttribute('data-ics-start', target);
   // iPhone: .ics publicado (Safari solo ofrece «Añadir al calendario» con un archivo real).
   // Fila opcional «ICS File»; si no, el del repo. Sus datos deben coincidir con las filas ICS.
-  cal.setAttribute('data-ics-file', cfg['ics-file'] || `${window.hlx.codeBasePath}/calendar/nfl-madrid-game.ics`);
+  // Por defecto, el del idioma de la página (/en/ → nfl-madrid-game-en.ics)
+  const icsFile = `nfl-madrid-game${pageLanguage() === 'en' ? '-en' : ''}.ics`;
+  cal.setAttribute('data-ics-file', cfg['ics-file'] || `${window.hlx.codeBasePath}/calendar/${icsFile}`);
   if (cfg['ics-allday']) cal.setAttribute('data-ics-allday', '');
   const hidden = document.createElement('span');
   hidden.className = 'visually-hidden';
-  hidden.textContent = ': añadir el NFL Madrid Game a tu calendario';
   const label = document.createElement('span');
   label.className = 'event-bar__cal-label';
-  label.textContent = 'Recuérdamelo';
+  localize(() => {
+    hidden.textContent = `: ${t('countdown-remind-hint', 'añadir el NFL Madrid Game a tu calendario')}`;
+    label.textContent = t('countdown-remind', 'Recuérdamelo');
+  });
   cal.append(icon('calendar', 'icon'), label, hidden);
   const wrap = document.createElement('div');
   wrap.className = 'event-bar__cal-wrap';
@@ -85,17 +104,14 @@ function buildCalMenu(cal, urls) {
     a.target = '_blank';
     a.rel = 'noopener';
     a.textContent = text;
-    const hint = document.createElement('span');
-    hint.className = 'visually-hidden';
-    hint.textContent = ' (se abre en una pestaña nueva)';
-    a.append(hint);
+    a.append(newTabHint());
     li.append(a);
     menu.append(li);
   });
   const li = document.createElement('li');
   const ics = document.createElement('button');
   ics.type = 'button';
-  ics.textContent = 'Apple Calendar u otro (.ics)';
+  ics.textContent = t('countdown-ics', 'Apple Calendar u otro (.ics)');
   ics.addEventListener('click', () => nflCalendar.downloadIcs(cal));
   li.append(ics);
   menu.append(li);
@@ -167,6 +183,20 @@ function initCountdown(block) {
     cells[el.getAttribute('data-unit')] = el;
   });
   let lastMinute = -1;
+  const plural = new Intl.PluralRules(pageLocale());
+
+  // Frase para lectores de pantalla: cada unidad en singular o plural
+  const PARTS = {
+    day: ['{count} día', '{count} días'],
+    hour: ['{count} hora', '{count} horas'],
+    minute: ['{count} minuto', '{count} minutos'],
+  };
+  function part(unit, count) {
+    const [one, other] = PARTS[unit];
+    return plural.select(count) === 'one'
+      ? t(`countdown-${unit}-one`, one, { count })
+      : t(`countdown-${unit}-other`, other, { count });
+  }
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -201,10 +231,17 @@ function initCountdown(block) {
     set('mins', pad(mins));
     if (mins !== lastMinute) {
       lastMinute = mins;
-      label.textContent = `Faltan ${days} días, ${hours} horas y ${mins} minutos para el NFL Madrid Game.`;
+      label.textContent = t(
+        'countdown-status',
+        'Faltan {days}, {hours} y {minutes} para el NFL Madrid Game.',
+        { days: part('day', days), hours: part('hour', hours), minutes: part('minute', mins) },
+      );
     }
     return true;
   }
+
+  // Cuando llega la hoja, la frase para lectores de pantalla se rehace en el siguiente segundo
+  loadPlaceholders().then(() => { lastMinute = -1; });
 
   box.hidden = false;
   if (tick()) {
@@ -223,7 +260,7 @@ export default function decorate(block) {
   inner.append(buildCalButton(cfg, target));
 
   block.replaceChildren(inner);
-  block.setAttribute('aria-label', 'Cuenta atrás del evento');
+  localize(() => block.setAttribute('aria-label', t('countdown-region', 'Cuenta atrás del evento')));
 
   initReminder(block);
   initCountdown(block);

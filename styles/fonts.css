@@ -1,5 +1,36 @@
 /*
- * The only web font (Bernabeu, /fonts/bernabeu-black.woff2) is declared in styles.css
- * so that titles do not jump. 'RM Neue' has no file (kept literally, resolves to sans-serif).
+ * Bernabeu (titles, /fonts/bernabeu-black.woff2) is declared in styles.css so that titles do not jump.
+ * RM Neue (text, --font-family) is declared here: loaded after LCP, sans-serif until then.
  * The boilerplate Roboto faces are not used by the prototype and were removed.
  */
+
+/* ─── Tipografía de texto · RM Neue ──────────────────── */
+
+/* _referencias/nfl-header-menu css/styles.css. Primero la instalada en el
+   equipo (local), si no la del proyecto (fonts/). */
+@font-face {
+  font-family: 'RM Neue';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('RM Neue Regular'), local('RMNeue-Regular'),
+    url('/fonts/rm-neue-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'RM Neue';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('RM Neue SemiBold'), local('RMNeue-SemiBold'),
+    url('/fonts/rm-neue-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'RM Neue';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('RM Neue Bold'), local('RMNeue-Bold'),
+    url('/fonts/rm-neue-bold.woff2') format('woff2');
+}

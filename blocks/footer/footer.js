@@ -1,13 +1,18 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { plainImg, cleanLink } from '../../scripts/nfl-utils.js';
+import { loadPlaceholders, t } from '../../scripts/placeholders.js';
 
 /* 11 · Footer — prototype index.html L483-508 (3 logos + nav institucional + legal). */
 
 const LOGO_MODS = ['game', 'bernabeu', 'madridistas'];
 /* intrinsic sizes of the prototype logos (CSS fixes the height) */
-const LOGO_SIZES = [[439, 572], [1584, 244], [338, 96]];
-const NAV_LABELS = ['Enlaces institucionales', 'Información legal'];
+const LOGO_SIZES = [[439, 572], [312, 168], [338, 96]];
+// [clave de la hoja, texto en español] por lista, en orden
+const NAV_LABELS = [
+  ['footer-nav', 'Enlaces institucionales'],
+  ['footer-legal', 'Información legal'],
+];
 const NAV_CLASSES = ['site-footer__nav', 'site-footer__legal'];
 
 function footerPath() {
@@ -21,7 +26,7 @@ function footerPath() {
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
-  const fragment = await loadFragment(footerPath());
+  const [fragment] = await Promise.all([loadFragment(footerPath()), loadPlaceholders()]);
   block.textContent = '';
   if (!fragment) return;
 
@@ -44,7 +49,7 @@ export default async function decorate(block) {
   [...fragment.querySelectorAll('ul')].forEach((list, i) => {
     const nav = document.createElement('nav');
     if (NAV_CLASSES[i]) nav.className = NAV_CLASSES[i];
-    if (NAV_LABELS[i]) nav.setAttribute('aria-label', NAV_LABELS[i]);
+    if (NAV_LABELS[i]) nav.setAttribute('aria-label', t(...NAV_LABELS[i]));
     const ul = document.createElement('ul');
     ul.setAttribute('role', 'list');
     [...list.querySelectorAll(':scope > li')].forEach((li) => {

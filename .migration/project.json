@@ -1,0 +1,9 @@
+{
+  "sites": {
+    "nfl-hub": {
+      "previewOrg": "eds-realmadrid",
+      "previewSite": "nfl-hub",
+      "contentHostUrl": "https://content.da.live/eds-realmadrid/nfl-hub/"
+    }
+  }
+}

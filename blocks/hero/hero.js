@@ -14,35 +14,19 @@ function isVideoLink(a) {
 }
 
 /* Vídeo de fondo — script.js L71-107 */
-function bindVideo(video, toggle) {
+function bindVideo(video) {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  function updateLabel() {
-    toggle.textContent = video.paused ? 'Reproducir vídeo' : 'Pausar vídeo';
-  }
-
-  function play() {
-    const promise = video.play();
-    // Si el navegador bloquea el autoplay, se queda en pausa con el botón disponible
-    if (promise && promise.catch) promise.catch(updateLabel);
-  }
-
-  toggle.addEventListener('click', () => {
-    if (video.paused) play();
-    else video.pause();
-  });
-
-  video.addEventListener('play', updateLabel);
-  video.addEventListener('pause', updateLabel);
 
   // Si el usuario activa movimiento reducido con la página abierta, se pausa
   const onMotionChange = (e) => { if (e.matches) video.pause(); };
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', onMotionChange);
   else if (reduceMotion.addListener) reduceMotion.addListener(onMotionChange);
 
-  toggle.hidden = false;
-  if (!reduceMotion.matches) play();
-  updateLabel();
+  if (!reduceMotion.matches) {
+    const promise = video.play();
+    // Si el navegador bloquea el autoplay, se queda el póster
+    if (promise && promise.catch) promise.catch(() => {});
+  }
 }
 
 export default function decorate(block) {
@@ -105,16 +89,9 @@ export default function decorate(block) {
     content.append(actions);
   }
 
-  // Control de pausa (WCAG 2.2.2). Oculto hasta que el JS lo activa.
-  const toggle = document.createElement('button');
-  toggle.className = 'hero__toggle';
-  toggle.type = 'button';
-  toggle.hidden = true;
-  toggle.textContent = 'Pausar vídeo';
-
-  block.replaceChildren(media, content, toggle);
+  block.replaceChildren(media, content);
   const h = content.querySelector('.hero__title');
   if (h) block.setAttribute('aria-labelledby', ensureId(h));
 
-  bindVideo(video, toggle);
+  bindVideo(video);
 }

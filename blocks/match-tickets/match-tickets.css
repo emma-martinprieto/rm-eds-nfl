@@ -1,15 +1,41 @@
-/* 03 · Entradas del partido — literal port of prototype styles.css L705-789
-   (.btn-pair L601-611 lives in styles/styles.css). */
+/* 03 · Entradas del partido — banner (Figma 7770-1363).
+   (.btn-pair lives in styles/styles.css). */
 /* stylelint-disable selector-class-pattern, media-feature-range-notation */
 
-/* Objetivo secundario: después de Noticias. Tarjeta oscura con borde y halo
-   del botón primario; foto con los escudos encima | datos | compra. */
+/* Medidas del Figma sin token equivalente:
+   móvil 375 → tarjeta 327, tablet 768 → tarjeta 688, escritorio 1440 → banner 1392 × 285.
+   El PNG de los jugadores trae aire transparente: lo opaco va del 22,4 % al 95,2 %
+   del ancho y del 0,9 % al 77,7 % del alto. Las posiciones lo compensan.
+   Las medidas que cambian con el ancho usan cqw (1cqw = 1 % del ancho de la tarjeta):
+   son rectas que pasan por los valores del Figma en cada tamaño. */
+.match-tickets {
+  --match-media-height: 297px;    /* foto apilada: 327 × 297 en móvil, ~688 × 300 en tablet */
+  --match-body-width: 532px;      /* columna de contenido en escritorio */
+  --match-body-start: 50%;        /* donde empieza esa columna (677 de 1392) */
+  --match-crests-width: 128px;    /* caja de los escudos en móvil y tablet: 128 × 63 */
+  --match-crests-height: 63px;
+  --match-crests-width-lg: 160px; /* caja de los escudos en escritorio: 160 × 62 */
+  --match-crests-height-lg: 62px;
+  --match-btn-min: 13em;          /* ancho mínimo de botón antes de apilarse */
+
+  /* Degradado oscuro (--color-off-black) sobre foto y jugadores:
+     se dibuja como máscara, así se funden con el fondo de la tarjeta */
+  --match-photo-fade-from: 60%;
+  --match-players-fade-from: 50%;
+  --match-players-fade-to: 72%;   /* ≈ borde inferior de la foto */
+
+  container-type: inline-size;
+}
+
+/* Móvil y tablet: tarjeta apilada. Foto arriba con los escudos y los jugadores
+   encima, fundida al fondo; contenido debajo. Borde 1,5 px con el
+   degradado del botón primario y su halo. */
 .match-tickets .match-card {
   --focus-color: var(--color-text-inverse);
 
+  position: relative;
   display: grid;
-  gap: var(--spacing-md);
-  padding: var(--spacing-base);
+  overflow: hidden;
   border: var(--border-width-strong) solid transparent;
   border-radius: var(--radius-xl);
   background:
@@ -19,44 +45,75 @@
   color: var(--color-text-inverse);
 }
 
+/* Mismo alto en móvil y tablet: al ensancharse, la foto pasa de casi
+   cuadrada a apaisada. overflow: los jugadores no pisan el título. */
 .match-tickets .match-card__media {
   position: relative;
   overflow: hidden;
-  aspect-ratio: var(--xp-media-ratio);
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg-dark);
+  height: var(--match-media-height);
 }
 
 .match-tickets .match-card__img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  mask-image: linear-gradient(to bottom, var(--color-off-black) var(--match-photo-fade-from), transparent);
   transition: transform var(--hover-duration) ease;
 }
 
 /* Hover (solo con ratón y sin movimiento reducido): mismo zoom suave que las
-   tarjetas de Experiencias. Solo crece la foto; los escudos quedan quietos. */
+   tarjetas de Experiencias. Solo crece la foto; jugadores y escudos quedan quietos. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .match-tickets .match-card:hover .match-card__img {
     transform: scale(var(--xp-zoom));
   }
 }
 
-/* Escudos (con el «vs» y un halo oscuro ya en la imagen) centrados sobre la foto */
-.match-tickets .match-card__teams {
+/* Jugadores abajo a la izquierda, lo opaco siempre pegado al borde izquierdo.
+   - 327 (móvil): 435 px de ancho, caja a 116 px (33 bajo los escudos).
+   - 688 (tablet): 376 px de ancho, caja a 154 px.
+   Entre medias encogen y bajan en proporción; por encima de 688 se quedan así. */
+.match-tickets .match-card__players {
+  --match-players-w: max(376px, calc(488px - 16.34cqw));
+
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--match-crest-width);
+  top: min(154px, calc(81.6px + 10.5cqw));
+  left: calc(var(--match-players-w) * -0.224);
+  width: var(--match-players-w);
+  max-width: none;
   height: auto;
-  transform: translate(-50%, -50%);
+  mask-image: linear-gradient(
+    to bottom,
+    var(--color-off-black) var(--match-players-fade-from),
+    transparent var(--match-players-fade-to)
+  );
 }
 
+/* Escudos (caja 128 × 63) a 16 px del borde superior: arriba a la izquierda en
+   móvil (327) y centrados en tablet (688); entre medias se desplazan al centro */
+.match-tickets .match-card__teams {
+  position: absolute;
+  top: var(--spacing-base);
+  left: clamp(
+    var(--spacing-base),
+    calc(73.1cqw - 223px),
+    calc(50cqw - var(--match-crests-width) / 2)
+  );
+  z-index: 1;
+  width: var(--match-crests-width);
+  height: var(--match-crests-height);
+  object-fit: cover;
+}
+
+/* Sin position en móvil/tablet: los escudos se colocan contra la tarjeta */
 .match-tickets .match-card__body {
   display: grid;
   align-content: center;
   justify-items: start;
   gap: var(--spacing-sm);
+  padding: var(--spacing-base) var(--spacing-md) var(--spacing-md);
 }
 
 .match-tickets .match-card__title {
@@ -69,21 +126,75 @@
 }
 
 .match-tickets .match-card__meta {
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   font-weight: var(--btn-font-weight);
 }
 
-/* Botones a todo el ancho de la columna (.btn-pair: columnas iguales desde tablet) */
+/* Botones a todo el ancho de la columna. En vez del cambio fijo de .btn-pair
+   en tablet, van en fila solo si caben los dos (tablet y escritorio) y se
+   apilan solos cuando la columna se estrecha (móvil). */
 .match-tickets .match-card__action {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--match-btn-min)), 1fr));
+  grid-auto-flow: row;
   justify-self: stretch;
   margin-top: var(--spacing-xs);
 }
 
+/* Escritorio: banner horizontal, más ancho que la retícula (1392 a 1440:
+   margen lateral de móvil). Foto a la izquierda fundida hacia la derecha,
+   jugadores en la transición cortados por abajo, contenido a la derecha. */
 @media (min-width: 1024px) { /* --breakpoint-desktop */
+  .match-tickets {
+    --match-photo-fade-from: 55%;
+    --match-players-fade-from: 48%;
+    --match-players-fade-to: 70%;
+
+    margin-inline: calc(var(--grid-margin-mobile) - var(--layout-margin));
+  }
+
   .match-tickets .match-card {
-    grid-template-columns: 2fr 3fr;
-    gap: var(--spacing-xl);
-    padding: var(--padding-card-compact);
+    grid-template-columns: var(--match-body-start) minmax(0, var(--match-body-width));
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 0;
+  }
+
+  /* La caja de medios se disuelve: foto y jugadores se posicionan contra la tarjeta */
+  .match-tickets .match-card__media {
+    display: contents;
+  }
+
+  /* Foto: 0 → 576 de 1392, fundida hacia la derecha */
+  .match-tickets .match-card__img {
+    right: auto;
+    width: 42%;
+    mask-image: linear-gradient(to right, var(--color-off-black) var(--match-photo-fade-from), transparent);
+  }
+
+  /* Jugadores, cortados por abajo:
+     - 1392 (pantalla 1440, Figma): 534 px a 278 px del borde → lo opaco va de
+       398 a 788 y empieza a 93 px.
+     - 976 (pantalla 1024): 440 px con lo opaco pegado al borde izquierdo,
+       como en tablet. Entre medias se desplazan y crecen en proporción. */
+  .match-tickets .match-card__players {
+    --match-players-w: calc(219.5px + 22.6cqw);
+
+    top: auto;
+    bottom: 0;
+    left: calc(90.6cqw - 983.6px);
+    transform: translateY(35%);
+  }
+
+  .match-tickets .match-card__teams {
+    position: static;
+    justify-self: center;
+    width: var(--match-crests-width-lg);
+    height: var(--match-crests-height-lg);
+  }
+
+  /* position: por encima de los jugadores, que llegan bajo los botones */
+  .match-tickets .match-card__body {
+    position: relative;
+    grid-column: 2;
+    padding: 0;
   }
 }

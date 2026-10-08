@@ -1,121 +1,112 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import { plainImg, cleanLink, timeEl } from '../../scripts/nfl-utils.js';
+import { plainImg } from '../../scripts/nfl-utils.js';
+import { icon } from '../../scripts/nfl-icons.js';
+import initReveal from '../../scripts/reveal.js';
+import initRowCarousel, { rowArrow } from '../../scripts/row-carousel.js';
+import initNewsLightbox from '../../scripts/news-lightbox.js';
+import { loadPlaceholders, t } from '../../scripts/placeholders.js';
 
-/* ─── Variant `flip` · 08 · Noticias — prototype index.html L306-361.
-   Behaviour = js/script.js L420-439 (tarjetas que giran). ─── */
+/* ─── Variant `news` · 08 · Noticias ───
+   Carrusel horizontal de tarjetas (scripts/row-carousel.js, también en desktop) y
+   lightbox con la noticia al pulsar «Leer más» (scripts/news-lightbox.js).
+   Una fila por noticia:
+   foto | categoría + titular (encabezado) + entradilla | enlace a la página de la noticia. */
 
-function flip(card, toBack) {
-  const front = card.querySelector('.news-card__front');
-  const back = card.querySelector('.news-card__back');
-  card.classList.toggle('is-flipped', toBack);
-  front.inert = toBack;
-  back.inert = !toBack;
-  card.querySelector('.news-card__front .news-card__flip').setAttribute('aria-expanded', String(toBack));
-  (toBack ? back.querySelector('.news-card__link') : front.querySelector('.news-card__flip')).focus({ preventScroll: true });
-}
+const TABLET = window.matchMedia('(min-width: 768px)'); // --breakpoint-tablet
+const DESKTOP = window.matchMedia('(min-width: 1024px)'); // --breakpoint-desktop
 
-function dateP(text) {
+function textP(className, text) {
   const p = document.createElement('p');
-  p.className = 'news-card__date';
-  p.append(timeEl(text));
+  p.className = className;
+  p.textContent = text;
   return p;
 }
 
-function buildNewsCard(row, n) {
-  const [imgCell, frontCell, backCell] = [...row.children];
-  const frontId = `noticia-${n}-frente`;
-  const backId = `noticia-${n}-detras`;
-
-  const heading = frontCell && frontCell.querySelector('h1, h2, h3, h4, h5, h6');
-  const titleText = heading ? heading.textContent.trim() : '';
-  const frontParas = frontCell ? [...frontCell.querySelectorAll(':scope > p')] : [];
-  const kids = frontCell ? [...frontCell.children] : [];
-  const hIdx = heading ? kids.indexOf(heading) : -1;
-  const dateText = (frontParas.find((p) => kids.indexOf(p) < hIdx) || { textContent: '' }).textContent.trim();
-  const teaserP = frontParas.find((p) => kids.indexOf(p) > hIdx);
-
-  // anverso
-  const front = document.createElement('div');
-  front.className = 'news-card__face news-card__front';
-  front.id = frontId;
-  const img = imgCell && imgCell.querySelector('img');
-  if (img) front.append(plainImg(img, 'news-card__media'));
-  if (dateText) front.append(dateP(dateText));
-  const h3 = document.createElement('h3');
-  h3.className = 'news-card__title';
-  h3.textContent = titleText;
-  front.append(h3);
-  if (teaserP) {
-    const teaser = document.createElement('p');
-    teaser.className = 'news-card__teaser';
-    teaser.textContent = teaserP.textContent.trim();
-    front.append(teaser);
-  }
-  const more = document.createElement('button');
-  more.className = 'news-card__flip';
-  more.type = 'button';
-  more.setAttribute('aria-controls', backId);
-  more.setAttribute('aria-expanded', 'false');
-  const moreHidden = document.createElement('span');
-  moreHidden.className = 'visually-hidden';
-  moreHidden.textContent = `: ${titleText}`;
-  more.append('Leer más', moreHidden);
-  front.append(more);
-
-  // reverso (fecha y título duplicados del anverso, como en el prototipo)
-  const back = document.createElement('div');
-  back.className = 'news-card__face news-card__back';
-  back.id = backId;
-  back.inert = true;
-  if (dateText) back.append(dateP(dateText));
-  const backTitle = document.createElement('p');
-  backTitle.className = 'news-card__back-title';
-  backTitle.textContent = titleText;
-  back.append(backTitle);
-  const backParas = backCell ? [...backCell.querySelectorAll(':scope > p')] : [];
-  backParas.forEach((p) => {
-    const a = p.querySelector('a');
-    if (a) {
-      back.append(cleanLink(a, 'news-card__link'));
-    } else {
-      const text = document.createElement('p');
-      text.className = 'news-card__text';
-      text.textContent = p.textContent.trim();
-      back.append(text);
-    }
-  });
-  const volver = document.createElement('button');
-  volver.className = 'news-card__flip news-card__flip--back';
-  volver.type = 'button';
-  volver.setAttribute('aria-controls', frontId);
-  volver.textContent = 'Volver';
-  back.append(volver);
-
-  const inner = document.createElement('div');
-  inner.className = 'news-card__inner';
-  inner.append(front, back);
-
+function buildNewsCard(row) {
+  const [imgCell, textCell, linkCell] = [...row.children];
   const li = document.createElement('li');
   li.className = 'news-card';
-  li.append(inner);
 
-  more.addEventListener('click', () => { flip(li, true); });
-  volver.addEventListener('click', () => { flip(li, false); });
+  const img = imgCell && imgCell.querySelector('img');
+  if (img) li.append(plainImg(img, 'news-card__media'));
+
+  // Texto: lo de antes del encabezado es la categoría; lo de después, la entradilla
+  const kids = textCell ? [...textCell.children] : [];
+  const heading = kids.find((el) => /^H[1-6]$/.test(el.tagName));
+  const hIdx = heading ? kids.indexOf(heading) : -1;
+  const paras = kids.filter((el) => el.tagName === 'P' && el.textContent.trim());
+  const categoryP = heading ? paras.find((p) => kids.indexOf(p) < hIdx) : paras[0];
+  const teaserP = heading ? paras.find((p) => kids.indexOf(p) > hIdx) : paras[1];
+  const category = categoryP ? categoryP.textContent.trim() : '';
+  const title = heading ? heading.textContent.trim() : '';
+
+  if (category) li.append(textP('news-card__category', category));
+  if (title) {
+    const h3 = document.createElement('h3');
+    h3.className = 'news-card__title';
+    h3.textContent = title;
+    li.append(h3);
+  }
+  if (teaserP) li.append(textP('news-card__teaser', teaserP.textContent.trim()));
+
+  // «Leer más ›»: enlace real a la página de la noticia (el lightbox lo intercepta)
+  const a = (linkCell && linkCell.querySelector('a')) || (textCell && textCell.querySelector('a'));
+  if (a && a.getAttribute('href')) {
+    const more = document.createElement('a');
+    more.className = 'news-card__more';
+    more.href = a.getAttribute('href');
+    if (category) more.dataset.category = category;
+    const hidden = document.createElement('span');
+    hidden.className = 'visually-hidden';
+    hidden.textContent = title ? `: ${title}` : '';
+    more.append(t('news-read-more', 'Leer más'), hidden, icon('chevron-right', 'icon'));
+    li.append(more);
+  }
   return li;
 }
 
-function decorateFlip(block) {
-  const ul = document.createElement('ul');
-  ul.className = 'news__grid';
-  ul.setAttribute('role', 'list');
-  [...block.children].forEach((row, i) => ul.append(buildNewsCard(row, i + 1)));
-  block.replaceChildren(ul);
+function decorateNews(block) {
+  const list = document.createElement('ul');
+  list.className = 'news__list';
+  list.setAttribute('role', 'list');
+  [...block.children].forEach((row) => list.append(buildNewsCard(row)));
+
+  const track = document.createElement('div');
+  track.className = 'news__track row-carousel__track';
+  track.id = 'noticias-carrusel'; // no «noticias»: puede ser el ancla de la sección
+  track.setAttribute('role', 'region');
+  track.setAttribute('aria-label', t('news-region', 'Últimas noticias'));
+  track.tabIndex = 0;
+  track.append(list);
+
+  const prev = rowArrow('prev', t('news-prev', 'Noticia anterior'), track.id);
+  const next = rowArrow('next', t('news-next', 'Noticia siguiente'), track.id);
+  const slider = document.createElement('div');
+  slider.className = 'news__slider row-carousel';
+  slider.append(prev, track, next);
+  block.replaceChildren(slider);
+
+  initRowCarousel({
+    track, list, prev, next,
+  });
+  initNewsLightbox(list.querySelectorAll('.news-card__more'));
+
+  // Cascada: título y las tarjetas que se ven enteras (3 desktop · 2 tablet · 1 móvil).
+  // La que asoma no se anima: con tan poco a la vista, no llegaría a «entrar» y quedaría oculta.
+  const section = block.closest('.section');
+  const heads = section ? [...section.querySelectorAll(':scope > .default-content-wrapper')] : [];
+  const visible = () => {
+    if (DESKTOP.matches) return 3;
+    return TABLET.matches ? 2 : 1;
+  };
+  initReveal(() => [...heads, ...[...list.children].slice(0, visible())], [TABLET, DESKTOP]);
 }
 
 /* ─── Standard Block Collection cards ─── */
-export default function decorate(block) {
-  if (block.classList.contains('flip')) {
-    decorateFlip(block);
+export default async function decorate(block) {
+  await loadPlaceholders();
+  if (block.classList.contains('news')) {
+    decorateNews(block);
     return;
   }
   /* change to ul, li */

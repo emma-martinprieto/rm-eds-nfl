@@ -1,4 +1,5 @@
 import { plainImg, toButton, ensureId } from '../../scripts/nfl-utils.js';
+import { loadPlaceholders } from '../../scripts/placeholders.js';
 
 /* Paquetes Hospitality — prototype index.html L394-409 (article.hospitality).
    Interaction: CSS hover only. Helmets are decorative (aria-hidden container, alt=""). */
@@ -6,7 +7,8 @@ import { plainImg, toButton, ensureId } from '../../scripts/nfl-utils.js';
 const HELMET_MODS = ['falcons', 'bengals'];
 const HELMET_SIZES = [[600, 600], [600, 520]];
 
-export default function decorate(block) {
+export default async function decorate(block) {
+  await loadPlaceholders(); // toButton: «se abre en una pestaña nueva» en el idioma de la página
   const [photoRow, helmetsRow, bodyRow] = [...block.children];
 
   const article = document.createElement('article');

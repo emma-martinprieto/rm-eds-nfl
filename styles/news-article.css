@@ -1,0 +1,162 @@
+/* Artículo de noticia (scripts/news-article.js): el mismo en el lightbox de Noticias
+   y en la página de la noticia (metadato `Template: news` → body.news).
+   Provisional: el diseño de la página de la noticia está pendiente de confirmar.
+   Los selectores llevan .default-content-wrapper para ganar a los estilos de
+   cabecera de sección de styles.css (main > .section > .default-content-wrapper h2/p). */
+/* stylelint-disable selector-class-pattern, no-descending-specificity, media-feature-range-notation */
+
+/* ─── Cabecera: foto 16:9 · «categoría · fecha» · titular · línea ─── */
+.news-article .news-article__head {
+  display: grid;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.news-article .news-article__media {
+  margin-bottom: var(--spacing-xs);
+}
+
+.news-article .news-article__media img {
+  width: 100%;
+  aspect-ratio: var(--news-ratio);
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.news-article .default-content-wrapper .news-article__meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.news-article .default-content-wrapper .news-article__title {
+  color: var(--color-text-title);
+  font-family: var(--font-family-display);
+  font-size: var(--text-title-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+}
+
+.news-article .news-article__rule {
+  width: 100%;
+  margin: var(--spacing-xs) 0 0;
+  border: 0;
+  border-top: var(--border-width) solid var(--color-line);
+}
+
+/* ─── Cuerpo: subtítulos, párrafos, listas, preguntas (H3 + párrafo) ─── */
+.news-article .default-content-wrapper h2 {
+  margin-top: var(--spacing-lg);
+  color: var(--color-text-title);
+  font-family: var(--font-family);
+  font-size: var(--text-body-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: normal;
+  line-height: var(--lh-heading);
+  text-transform: none;
+}
+
+.news-article .default-content-wrapper h3 {
+  margin-top: var(--spacing-md);
+  color: var(--color-text-title);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--lh-heading);
+}
+
+.news-article .default-content-wrapper p,
+.news-article .default-content-wrapper ul,
+.news-article .default-content-wrapper ol {
+  max-width: none;
+  margin-top: var(--spacing-xs);
+  font-size: var(--text-body);
+}
+
+.news-article .default-content-wrapper :is(h2, h3) + p {
+  margin-top: var(--spacing-2xs);
+}
+
+.news-article .default-content-wrapper :is(ul, ol) {
+  padding-left: var(--spacing-md);
+}
+
+.news-article .default-content-wrapper li + li {
+  margin-top: var(--spacing-2xs);
+}
+
+/* Bloques del artículo (Table, Accordion) y secciones seguidas */
+.news-article .section > div + div,
+.news-article .section + .section {
+  margin-top: var(--spacing-md);
+}
+
+/* Botón: enlace en negrita → .btn */
+.news-article .default-content-wrapper .news-article__button {
+  margin-top: var(--spacing-md);
+}
+
+/* Cierre del artículo (último H2 → final, con botón): caja tipo banner a todo el ancho
+   del artículo, alto según el contenido (Figma: color/surface-offwhite, radius/lg,
+   padding de tarjeta, 12 entre título, párrafo y botón).
+   Contraste sobre --color-surface-offwhite: título 15,4:1 · cuerpo 7,7:1 (AA de sobra);
+   el botón lleva su propio fondo. */
+.news-article .news-article__cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xl);
+  padding: var(--padding-card-compact);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-offwhite);
+}
+
+/* Dentro de la caja, el espacio lo pone el gap: fuera los márgenes del artículo */
+.news-article .default-content-wrapper .news-article__cta > * {
+  margin: 0;
+}
+
+/* Móvil: el botón ocupa todo el ancho de la caja */
+@media (max-width: 767px) { /* por debajo de --breakpoint-tablet */
+  .news-article .news-article__cta .btn {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) { /* --breakpoint-tablet */
+  .news-article .news-article__cta {
+    padding: var(--padding-card);
+  }
+}
+
+/* ─── Página de la noticia (metadato Template: news) ───
+   La cabecera de la landing es transparente sobre el vídeo: aquí, sobre fondo claro, va oscura */
+body.news header.site-header {
+  background: var(--color-bg-dark);
+}
+
+main.news-article {
+  padding-block: calc(var(--header-offset) + var(--spacing-xl)) var(--section-padding);
+}
+
+main.news-article > .section {
+  padding-block: 0;
+}
+
+/* Columna de lectura: el ancho del panel del lightbox */
+main.news-article > .section > div {
+  max-width: calc(var(--lightbox-width) + 2 * var(--layout-margin));
+}
+
+main.news-article > .section > .default-content-wrapper {
+  display: block;
+  margin-bottom: 0;
+}
+
+.news-article .default-content-wrapper .news-article__back {
+  margin-top: var(--spacing-xl);
+  font-weight: var(--btn-font-weight);
+}

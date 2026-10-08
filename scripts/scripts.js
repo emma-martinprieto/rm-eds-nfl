@@ -13,31 +13,7 @@ import {
   toClassName,
   toCamelCase,
 } from './aem.js';
-
-if (window.trustedTypes && window.trustedTypes.createPolicy) {
-  const innerTT = window.trustedTypes.createPolicy('tt-inner', {
-    createHTML: (s) => s, // avoid stack overflow
-  });
-
-  window.trustedTypes.createPolicy('default', {
-    createHTML: (input, type, sink) => {
-      let processedInput = input;
-      if (/srcdoc\s*=/i.test(processedInput)) {
-        const doc = new DOMParser().parseFromString(innerTT.createHTML(processedInput), 'text/html');
-        doc.querySelectorAll('iframe[srcdoc]').forEach((el) => el.removeAttribute('srcdoc'));
-        processedInput = doc.body.innerHTML;
-      }
-      if (sink.includes('createContextualFragment') || sink.includes('Document write')) {
-        const doc = new DOMParser().parseFromString(innerTT.createHTML(processedInput), 'text/html');
-        doc.querySelectorAll('script').forEach((el) => el.remove());
-        processedInput = doc.body.innerHTML;
-      }
-      return processedInput;
-    },
-    createScriptURL: (input) => input,
-    createScript: (input) => input,
-  });
-}
+import { pageLanguage, languagePaths, loadPlaceholders } from './placeholders.js';
 
 /**
  * load fonts.css and set a session storage flag
@@ -243,16 +219,44 @@ async function loadScrollBall() {
 }
 
 /**
+ * <link rel="alternate" hreflang> entre la versión española y la inglesa de la página
+ * (languagePaths: metadato Alternate Path o cálculo con /en/). x-default apunta a la
+ * española. URLs absolutas, sin query ni hash.
+ */
+function addHreflangLinks() {
+  if (document.head.querySelector('link[rel="alternate"][hreflang]')) return;
+  const { origin } = window.location;
+  const { es: esPath, en: enPath } = languagePaths();
+  [['es', esPath], ['en', enPath], ['x-default', esPath]].forEach(([lang, path]) => {
+    const link = document.createElement('link');
+    link.rel = 'alternate';
+    link.hreflang = lang;
+    link.href = `${origin}${path}`;
+    document.head.append(link);
+  });
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'es';
+  document.documentElement.lang = pageLanguage();
+  addHreflangLinks();
+  // Textos de interfaz: la petición sale ya, en paralelo; los bloques la esperan al decorarse
+  loadPlaceholders();
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
     main.id = 'contenido'; // skip-link target (prototype <main id="contenido">)
     decorateMain(main);
+    // Página de una noticia (metadato Template: news): la misma presentación que en el lightbox
+    if (document.body.classList.contains('news')) {
+      const { decorateArticle, addBackLink, loadArticleStyles } = await import('./news-article.js');
+      decorateArticle(main);
+      addBackLink(main);
+      await loadArticleStyles();
+    }
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
@@ -295,6 +299,7 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   import('./consent-check.js');
+  import('./campaign-params.js');
   // load anything that can be postponed to the latest here
 }
 

@@ -1,82 +1,444 @@
-/* 00 · Header — literal port of prototype styles.css L441-517.
-   The <header> element (header.header-wrapper.site-header) plays .site-header. */
-/* stylelint-disable selector-class-pattern, property-no-vendor-prefix */
+/* 00 · Header — port of _referencias/nfl-header-menu css/styles.css («00 · Header»).
+   The <header> element (header.site-header) plays .site-header; header.js builds
+   the rest. Tiempos y curvas: tabla de animaciones del LEEME (tokens en styles.css). */
+/* stylelint-disable selector-class-pattern, no-descending-specificity, media-feature-range-notation */
 
-/* Logos y selector de idioma, superpuesto al vídeo del hero con un degradado
-   suave arriba (en lugar de franja negra). El header no captura clics
-   (pointer-events: none); solo el selector de idioma. */
+/* Logos, menú de anclas y selector de idioma, superpuesto al vídeo del hero con
+   un degradado suave arriba (en lugar de franja negra). La cabecera no captura
+   clics (pointer-events: none); solo sus enlaces y botones. Fija: header.js la
+   compacta al bajar, la esconde si se sigue bajando y la muestra al subir. */
 header.site-header {
   --focus-color: var(--color-text-inverse);
 
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   left: 0;
-  z-index: 2;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-bg-dark) 45%, transparent), transparent);
+  z-index: 10; /* por encima del balón decorativo (z-index 5) */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-bg-dark) var(--header-scrim), transparent), transparent);
   pointer-events: none;
+  transition: transform var(--hover-duration) var(--menu-ease);
+}
+
+/* Al bajar: degradado más denso arriba que se funde hacia abajo, para que el
+   menú blanco se lea también sobre secciones claras. Va en ::before para poder
+   aparecer con un fundido (los degradados no se animan). */
+header.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 calc(var(--spacing-lg) * -1);
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-bg-dark) var(--header-scrim-strong), transparent) 0%,
+    color-mix(in srgb, var(--color-bg-dark) var(--header-scrim-mid), transparent) 55%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity var(--hover-duration) ease;
+}
+
+header.site-header--scrolled::before {
+  opacity: 1;
+}
+
+/* Escondida al bajar; vuelve al subir (nunca con el menú abierto) */
+header.site-header--hidden {
+  transform: translateY(-100%);
 }
 
 header .site-header__inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-base);
-  padding-block: var(--spacing-md) var(--spacing-xl);
+  padding-block: var(--spacing-md); /* Figma: 24 arriba y abajo */
+  transition: padding var(--hover-duration) ease;
 }
 
-/* Selector de idioma: cápsula con desenfoque, como el «Row Arrow» */
-header .lang-switch {
-  display: flex;
-  padding: var(--spacing-2xs);
-  border: var(--border-width) solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
-  border-radius: var(--radius-pill);
-  background-color: color-mix(in srgb, var(--color-bg-dark) 56%, transparent);
-  -webkit-backdrop-filter: blur(var(--blur-arrow));
-  backdrop-filter: blur(var(--blur-arrow));
-  pointer-events: auto;
+/* Compacta al bajar */
+header.site-header--scrolled .site-header__inner {
+  padding-block: var(--spacing-sm) var(--spacing-base);
 }
 
-header .lang-switch__item {
-  display: grid;
-  place-items: center;
-  min-width: var(--btn-height-sm);
-  min-height: var(--spacing-lg);
-  border-radius: var(--radius-pill);
-  color: var(--color-text-inverse);
-  font-size: var(--text-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--tracking-caps);
-  text-decoration: none;
-  transition: var(--btn-transition);
-}
-
-header .lang-switch__item:hover {
-  background-color: color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
-}
-
-header .lang-switch__item[aria-current] {
-  background-color: var(--color-text-inverse);
-  color: var(--color-off-black);
-}
-
+/* ─── Logos ───────────────────────────────────────────────
+   Por posición en el grupo (las imágenes del documento nav, en orden):
+   1.º logotipo Bernabéu · 2.º escudo NFL (el balón del hero sale de su centro).
+   Figma: Bernabéu 59×32 y escudo NFL 29×40 (212×288 a 40 de alto),
+   centrados en vertical, con 24 entre ellos (83 del inicio del Bernabéu al escudo).
+   Medidas fijas: sin salto al cargar.
+   A 24 del borde izquierdo en todos los tamaños, no al margen de la retícula
+   (40/64/96): se compensa la diferencia. */
 header .site-header__logos {
+  margin-inline-start: calc(var(--spacing-md) - var(--layout-margin));
   display: flex;
   align-items: center;
   gap: var(--spacing-md); /* Figma: 24 */
 }
 
 header .site-header__logo {
-  width: auto;
-}
-
-/* Figma: logotipo Bernabéu 78×42 y escudo NFL de 56 de alto (≈41 de ancho) */
-header .site-header__logo--bernabeu {
-  width: 78px;
-  height: 42px;
+  flex: none;
   object-fit: contain;
 }
 
-header .site-header__logo--nfl {
-  height: var(--btn-height-lg);
+header .site-header__logo:nth-child(1) {
+  width: 59px;
+  height: 32px;
+}
+
+header .site-header__logo:nth-child(2) {
+  width: auto;
+  height: 40px;
+  aspect-ratio: 212 / 288;
+}
+
+/* ─── Menú de anclas (desktop) ────────────────────────── */
+header .site-nav {
+  margin-left: auto;
+  pointer-events: auto;
+}
+
+header .site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--spacing-md);
+}
+
+header .site-nav__link {
+  display: flex;
+  align-items: center;
+  min-height: var(--btn-height-sm);
+  color: var(--color-text-inverse);
+  font-size: var(--text-body);
+  font-weight: var(--btn-font-weight);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: var(--spacing-xs);
+  transition: var(--btn-transition);
+}
+
+/* Hover: subrayado tenue. Activa (sección visible, aria-current): subrayado blanco */
+header .site-nav__link:hover {
+  text-decoration-color: var(--color-text-inverse-subtle);
+}
+
+header .site-nav__link[aria-current] {
+  text-decoration-color: var(--color-text-inverse);
+  text-decoration-thickness: var(--burger-line);
+}
+
+header .site-header__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* ─── Selector de idioma: «ES | EN», el activo en blanco y el otro atenuado ── */
+header .lang-switch {
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
+
+header .lang-switch__item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: var(--btn-height-md);
+  min-height: var(--btn-height-md);
+  color: var(--color-text-inverse-muted);
+  font-size: var(--text-body);
+  font-weight: var(--btn-font-weight);
+  text-decoration: none;
+  transition: var(--btn-transition);
+}
+
+/* Separador vertical entre idiomas */
+header .lang-switch__item + .lang-switch__item::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: var(--spacing-md);
+  border-left: var(--border-width) solid var(--color-text-inverse-subtle);
+  transform: translateY(-50%);
+}
+
+header .lang-switch__item:hover,
+header .lang-switch__item[aria-current] {
+  color: var(--color-text-inverse);
+}
+
+/* ─── Hamburguesa: tres rayas que pasan a X; por encima del panel ── */
+header .site-header__menu-btn {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--btn-height-md);
+  height: var(--btn-height-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color var(--menu-duration) var(--menu-ease);
+}
+
+header .site-header__burger {
+  position: relative;
+  width: var(--spacing-md);
+  height: var(--spacing-base);
+}
+
+header .site-header__burger span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: var(--burger-line);
+  border-radius: var(--radius-pill);
+  background-color: currentcolor;
+  transition: transform var(--hover-duration) ease, opacity var(--hover-duration) ease;
+}
+
+header .site-header__burger span:nth-child(1) {
+  top: 0;
+}
+
+header .site-header__burger span:nth-child(2) {
+  top: calc(50% - var(--burger-line) / 2);
+}
+
+header .site-header__burger span:nth-child(3) {
+  bottom: 0;
+}
+
+header.site-header--open .site-header__menu-btn {
+  color: var(--color-text-primary);
+}
+
+header.site-header--open .site-header__burger span:nth-child(1) {
+  transform: translateY(calc(var(--spacing-base) / 2 - var(--burger-line) / 2)) rotate(45deg);
+}
+
+header.site-header--open .site-header__burger span:nth-child(2) {
+  opacity: 0;
+}
+
+header.site-header--open .site-header__burger span:nth-child(3) {
+  transform: translateY(calc(var(--spacing-base) / -2 + var(--burger-line) / 2)) rotate(-45deg);
+}
+
+/* ─── Panel lateral (tablet y móvil) ──────────────────────
+   Entra desde la derecha con el borde izquierdo curvo, que se endereza al
+   llegar. Fondo claro; anclas en la tipografía de títulos; idioma al final. */
+header.site-header--open {
+  z-index: 20;
+}
+
+header .menu-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+header .menu-drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in srgb, var(--color-bg-dark) var(--menu-backdrop), transparent);
+  opacity: 0;
+  transition: opacity var(--menu-duration) var(--menu-ease);
+}
+
+header .menu-drawer__panel {
+  --focus-color: var(--color-primary);
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, var(--menu-max-width));
+  padding: calc(var(--btn-height-md) + var(--spacing-xl)) var(--layout-margin) var(--spacing-xl);
+  overflow-y: auto;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-body);
+  transform: translateX(calc(100% + var(--menu-curve)));
+  transition: transform var(--menu-duration) var(--menu-ease);
+}
+
+/* Recibe el foco al abrir (lectores de pantalla y teclado) sin marco visible */
+header .menu-drawer__panel:focus {
+  outline: none;
+}
+
+/* Borde curvo: un abombado a la izquierda del panel que se aplana al abrir */
+header .menu-drawer__curve {
+  position: absolute;
+  top: 0;
+  left: calc(var(--border-width) - var(--menu-curve));
+  width: var(--menu-curve);
+  max-width: none;
+  height: 100%;
+  fill: var(--color-bg-light);
+  transform-origin: right center;
+  transition: transform var(--menu-duration) var(--menu-ease);
+}
+
+header.site-header--open .menu-drawer {
+  pointer-events: auto;
+}
+
+header.site-header--open .menu-drawer__backdrop {
+  opacity: 1;
+}
+
+header.site-header--open .menu-drawer__panel {
+  transform: none;
+}
+
+/* LEEME: el borde curvo tarda 1 s (0,8 × 1,25) con la misma curva */
+header.site-header--open .menu-drawer__curve {
+  transform: scaleX(0);
+  transition-duration: calc(var(--menu-duration) * 1.25);
+}
+
+header .menu-drawer__list {
+  padding: 0;
+  border-top: var(--border-width) solid var(--color-line);
+}
+
+header .menu-drawer__list li {
+  border-bottom: var(--border-width) solid var(--color-line);
+}
+
+header .menu-drawer__link {
+  display: flex;
+  align-items: baseline;
+  padding-block: var(--spacing-base);
+  color: var(--color-text-title);
+  text-decoration: none;
+}
+
+header .menu-drawer__text {
+  font-family: var(--font-family-display);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+  transition: transform var(--hover-duration) var(--menu-ease), color var(--hover-duration) ease;
+}
+
+header .menu-drawer__link:hover .menu-drawer__text,
+header .menu-drawer__link:focus-visible .menu-drawer__text,
+header .menu-drawer__link[aria-current] .menu-drawer__text {
+  color: var(--color-primary);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  header .menu-drawer__link:hover .menu-drawer__text {
+    transform: translateX(var(--spacing-base));
+  }
+}
+
+/* Idioma: última opción del menú, en oscuro sobre el panel claro */
+header .menu-drawer__lang {
+  display: flex;
+  margin-top: var(--spacing-lg);
+  margin-left: calc(var(--spacing-base) * -1); /* alinea «ES» con el texto de las anclas */
+}
+
+header .menu-drawer__lang .lang-switch__item {
+  color: var(--color-text-muted);
+}
+
+header .menu-drawer__lang .lang-switch__item + .lang-switch__item::before {
+  border-left-color: var(--color-line);
+}
+
+header .menu-drawer__lang .lang-switch__item:hover,
+header .menu-drawer__lang .lang-switch__item[aria-current] {
+  color: var(--color-text-title);
+}
+
+/* Sin scroll de la página con el panel abierto (clase que pone header.js en <html>) */
+html.menu-is-open {
+  overflow: hidden;
+}
+
+/* Tablet y móvil: menú e idioma solo dentro del panel */
+@media (max-width: 1023px) { /* por debajo de --breakpoint-desktop */
+  header .site-nav,
+  header .site-header__tools > .lang-switch {
+    display: none;
+  }
+}
+
+/* Desktop: sobre la retícula de 12 columnas (--layout-columns / --layout-gutter).
+   Logos al principio, idioma al final y el menú arrancando en una columna fija:
+   Figma (1440): menú de 434 a 630 del borde = inicio de la columna 6.
+   De 1024 a 1439 arranca una columna antes (5) para que quepa entero.
+   Sin hamburguesa ni panel. */
+@media (min-width: 1024px) { /* --breakpoint-desktop */
+  header .site-header__inner {
+    display: grid;
+    grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    column-gap: var(--layout-gutter);
+  }
+
+  header .site-header__logos {
+    grid-column: 1 / 5;
+  }
+
+  header .site-nav {
+    grid-column: 5 / 11;
+    justify-self: start;
+    margin-left: 0;
+  }
+
+  header .site-nav__list {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  header .site-header__tools {
+    grid-column: 11 / -1;
+    justify-self: end;
+  }
+
+  header .site-header__menu-btn,
+  header .menu-drawer {
+    display: none;
+  }
+}
+
+@media (min-width: 1440px) { /* --breakpoint-wide */
+  header .site-nav {
+    grid-column: 6 / 11;
+  }
+}
+
+/* Sin animaciones con movimiento reducido: todo aparece y desaparece al instante */
+@media (prefers-reduced-motion: reduce) {
+  header.site-header,
+  header.site-header::before,
+  header .site-header__inner,
+  header .site-header__menu-btn,
+  header .site-header__burger span,
+  header .menu-drawer__panel,
+  header .menu-drawer__backdrop,
+  header .menu-drawer__curve,
+  header .menu-drawer__text {
+    transition: none;
+  }
+
+  header .menu-drawer__curve {
+    display: none;
+  }
 }

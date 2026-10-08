@@ -3,19 +3,6 @@
    (styles.css `main > .section.dark`). */
 /* stylelint-disable selector-class-pattern, property-no-vendor-prefix, media-feature-range-notation, no-descending-specificity */
 
-/* Aparición en cascada al entrar en la sección. Las clases las pone y las quita
-   el JS del bloque (sin JS, o con movimiento reducido, todo se ve desde el principio). */
-.experience-cards-container .reveal {
-  opacity: 0;
-  transform: translateY(var(--spacing-md));
-  transition: opacity var(--reveal-duration) ease, transform var(--reveal-duration) ease;
-}
-
-.experience-cards-container .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
 /* Filtro por nivel: plegado por defecto para que pase desapercibido */
 .experience-cards .xp-filter {
   margin-bottom: var(--spacing-lg);

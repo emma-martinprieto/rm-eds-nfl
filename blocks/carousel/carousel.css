@@ -2,71 +2,27 @@
    styles.css L1243-1437 (.row-arrow base lives in styles/styles.css, L351-375). */
 /* stylelint-disable selector-class-pattern, media-feature-range-notation, no-descending-specificity */
 
-.carousel .membership__slider {
-  position: relative;
-}
-
-.carousel .membership__slider .row-arrow {
-  position: absolute;
-  top: 50%;
-  z-index: 1;
-  transform: translateY(-50%);
-}
-
-.carousel .row-arrow--prev {
-  left: calc(var(--layout-margin) * -1 + var(--spacing-xs));
-}
-
-.carousel .row-arrow--next {
-  right: calc(var(--layout-margin) * -1 + var(--spacing-xs));
-}
-
-.carousel .membership__carousel::-webkit-scrollbar {
-  display: none;
-}
-
-/* Arrastrar con el ratón */
-.carousel .membership__carousel.is-draggable {
-  cursor: grab;
-}
-
-.carousel .membership__carousel.is-dragging {
-  cursor: grabbing;
-  scroll-snap-type: none;
-  user-select: none;
-}
-
-/* Móvil y tablet: carrusel horizontal con scroll-snap. Se ve asomar la
-   siguiente tarjeta. Región enfocable para desplazarla con el teclado. */
-.carousel .membership__carousel {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--layout-margin);
-  scrollbar-width: none; /* sin barra: las flechas y la tarjeta que asoma ya indican que hay más */
-  margin-inline: calc(var(--layout-margin) * -1);
+/* Móvil y tablet: carrusel horizontal (.row-carousel, styles.css). Se ve asomar
+   la siguiente tarjeta. Aquí solo lo propio de Planes. */
+.carousel.planes .membership__carousel {
   padding: var(--spacing-base) var(--layout-margin) var(--spacing-lg); /* arriba: etiqueta y elevación; abajo: sombra */
 }
 
-.carousel .membership__plans {
+.carousel.planes .membership__plans {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 85%;
   gap: var(--gap-cards);
 }
 
-.carousel .membership__plans > .plan {
-  scroll-snap-align: start;
-}
-
 @media (min-width: 768px) { /* --breakpoint-tablet */
-  .carousel .membership__plans {
-    grid-auto-columns: 45%;
+  .carousel.planes .membership__plans {
+    grid-auto-columns: 60%;
   }
 }
 
 /* Tarjeta sutil: borde fino, sin fondo de color */
-.carousel .plan {
+.carousel.planes .plan {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -79,19 +35,28 @@
   transition: box-shadow var(--hover-duration) ease;
 }
 
+/* Durante la aparición en cascada (desktop), la transición de .plan taparía
+   la de .reveal: se suman las dos. El escalonado (--reveal-delay) no alcanza a la sombra. */
+.carousel.planes .plan.reveal {
+  transition:
+    opacity var(--reveal-duration) ease var(--reveal-delay, 0s),
+    transform var(--reveal-duration) ease var(--reveal-delay, 0s),
+    box-shadow var(--hover-duration) ease;
+}
+
 /* Al elegirla (ratón encima o foco en su botón): gana sombra, sin elevación */
-.carousel .plan:hover,
-.carousel .plan:focus-within {
+.carousel.planes .plan:hover,
+.carousel.planes .plan:focus-within {
   box-shadow: var(--btn-primary-shadow);
 }
 
-/* Recomendado: borde más marcado */
-.carousel .plan--featured {
+/* Borde más marcado (variante `featured`, hoy sin uso: el destacado es Platinum) */
+.carousel.planes .plan--featured {
   border: var(--border-width-strong) solid var(--color-text-primary);
 }
 
 /* Platinum: el degradado solo en el borde */
-.carousel .plan--platinum {
+.carousel.planes .plan--platinum {
   border: var(--border-width-strong) solid transparent;
   background:
     linear-gradient(var(--color-bg-light), var(--color-bg-light)) padding-box,
@@ -99,7 +64,7 @@
 }
 
 /* Etiqueta sobre el borde superior */
-.carousel .plan__tag {
+.carousel.planes .plan__tag {
   position: absolute;
   top: 0;
   left: var(--padding-card-compact);
@@ -115,12 +80,12 @@
   text-transform: uppercase;
 }
 
-.carousel .plan__tag--platinum {
+.carousel.planes .plan__tag--platinum {
   background: var(--platinum-surface);
   color: var(--color-off-black);
 }
 
-.carousel .plan__name {
+.carousel.planes .plan__name {
   color: var(--color-text-title);
   font-family: var(--font-family-display);
   font-size: var(--text-title-sm);
@@ -130,26 +95,26 @@
   text-transform: uppercase;
 }
 
-.carousel .plan__price {
+.carousel.planes .plan__price {
   color: var(--color-text-title);
   font-size: var(--text-title-sm);
   font-weight: var(--font-weight-bold);
   line-height: var(--lh-heading);
 }
 
-.carousel .plan__period,
-.carousel .plan__alt {
+.carousel.planes .plan__period,
+.carousel.planes .plan__alt {
   color: var(--color-text-muted);
   font-size: var(--text-small);
   font-weight: normal;
 }
 
-.carousel .plan__claim {
+.carousel.planes .plan__claim {
   color: var(--color-text-subtitle);
   font-size: var(--text-small);
 }
 
-.carousel .plan__benefits {
+.carousel.planes .plan__benefits {
   display: grid;
   gap: var(--spacing-xs);
   align-self: stretch;
@@ -158,40 +123,45 @@
   line-height: var(--lh-small);
 }
 
-.carousel .plan__benefits li {
+.carousel.planes .plan__benefits li {
   display: flex;
   align-items: flex-start;
   gap: var(--spacing-xs);
 }
 
-.carousel .plan__benefits .icon {
+.carousel.planes .plan__benefits .icon {
   margin-top: var(--spacing-2xs);
   color: var(--color-success-dark);
 }
 
-.carousel .plan__cta {
+/* Lista → botón: 16 de margen + 8 de gap = 24 en la tarjeta más alta;
+   en las demás, margin-top: auto lo baja a la misma altura */
+.carousel.planes .plan__cta {
   margin-top: auto;
   align-self: stretch;
 }
 
+/* Cuatro columnas iguales, sin carrusel. Misma altura (manda la más larga),
+   sin altura fija. Orden del DOM en todos los tamaños: Platinum · Premium ·
+   Junior · Free. */
 @media (min-width: 1024px) { /* --breakpoint-desktop */
-  .carousel .membership__carousel {
+  .carousel.planes .membership__carousel {
     overflow: visible;
     margin-inline: 0;
     padding-inline: 0;
   }
 
-  .carousel .membership__plans {
+  .carousel.planes .membership__plans {
     grid-auto-flow: row;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items: stretch;
   }
 
-  .carousel .plan {
+  .carousel.planes .plan {
     padding: var(--padding-card);
   }
 
-  .carousel .plan__tag {
+  .carousel.planes .plan__tag {
     left: var(--padding-card);
   }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
   <meta
@@ -7,48 +7,141 @@
     content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none';"
     move-to-http-header="true"
   >
-  <title>Page not found</title>
+  <title>Página no encontrada · NFL Madrid Game 2026</title>
+  <meta name="robots" content="noindex">
   <script nonce="aem" type="text/javascript">
     window.isErrorPage = true;
     window.errorCode = '404';
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:title" content="Page not found">
-  <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
+  <meta property="og:title" content="Página no encontrada · NFL Madrid Game 2026">
   <script nonce="aem" type="module">
-    window.addEventListener('load', () => {
-      if (document.referrer) {
-        const { origin, pathname } = new URL(document.referrer);
-        if (origin === window.location.origin) {
-          const backBtn = document.createElement('a');
-          backBtn.classList.add('button', 'error-button-back');
-          backBtn.href = pathname;
-          backBtn.textContent = 'Go back';
-          backBtn.title = 'Go back';
-          const btnContainer = document.querySelector('.button-container');
-          btnContainer.append(backBtn);
-        }
-      }
-    });
+    if (/(^|\/)en(\/|$)/.test(window.location.pathname)) {
+      document.documentElement.lang = 'en';
+      document.title = 'Page not found · NFL Madrid Game 2026';
+      document.querySelectorAll('main.error [data-en]').forEach((el) => {
+        el.textContent = el.dataset.en;
+      });
+      document.querySelectorAll('main.error [data-en-href]').forEach((a) => {
+        a.href = a.dataset.enHref;
+      });
+    }
   </script>
+  <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
   <script nonce="aem" type="module">
     import { sampleRUM } from '/scripts/aem.js';
     sampleRUM('404', { source: document.referrer });
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
+    /* Cabecera en negro sólido, como en la página de una noticia */
+    body header.site-header {
+      background: var(--color-bg-dark);
+    }
+
     main.error {
-      min-height: calc(100vh - var(--nav-height));
-      display: flex;
-      align-items: center;
+      background: var(--color-surface-light);
     }
 
-    main.error .error-number {
+    main.error .section {
       width: 100%;
+      padding: var(--section-padding) var(--layout-margin);
+      text-align: center;
     }
 
-    main.error .error-number text {
-      font-family: monospace;
+    /* EDS: el contenido va en .default-content-wrapper, que es un grid con gap;
+       aquí la separación la ponen los márgenes de cada elemento */
+    main.error > .section > .default-content-wrapper {
+      display: block;
+    }
+
+    main.error .error-illustration {
+      display: block;
+      width: 314px;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto var(--spacing-lg);
+      /* La portería pesa a la izquierda (el balón sobresale a la derecha):
+         se desplaza para que quede centrada con el texto, sin mover la caja */
+      translate: var(--spacing-md) 0;
+    }
+
+    /* main.error .default-content-wrapper: gana a la regla global de los <p> del wrapper */
+    main.error .default-content-wrapper .error-eyebrow {
+      max-width: none;
+      margin: 0 0 var(--gap-title-body);
+      color: var(--color-primary);
+      font-size: var(--text-caption);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--lh-caption);
+      letter-spacing: var(--tracking-caps);
+      text-transform: uppercase;
+    }
+
+    /* Display/XL */
+    main.error .error-title {
+      max-width: 640px;
+      margin: 0 auto var(--gap-title-body);
+      color: var(--color-text-primary);
+      font-family: var(--font-family-display);
+      font-size: var(--text-display-xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1;
+      letter-spacing: var(--tracking-display);
+      text-transform: uppercase;
+    }
+
+    /* Body/LG */
+    main.error .default-content-wrapper .error-text {
+      max-width: 640px;
+      margin: 0 auto var(--spacing-lg);
+      font-size: var(--text-body-lg);
+    }
+
+    main.error .default-content-wrapper .error-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-inline);
+      max-width: none;
+      margin: 0 0 var(--spacing-lg);
+    }
+
+    main.error .error-actions .btn {
+      height: var(--btn-height-md);
+      margin: 0;
+      padding-block: 0;
+    }
+
+    main.error .default-content-wrapper .error-shortcuts-label {
+      max-width: none;
+      margin: 0;
+    }
+
+    main.error .error-shortcuts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--gap-inline);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    @media (width >= 600px) {
+      main.error .default-content-wrapper .error-actions {
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+
+    /* Desktop (Figma): el dibujo de 314 × 217 centrado en una caja de 362 × 252 */
+    @media (width >= 1024px) {
+      main.error .error-illustration {
+        box-sizing: content-box;
+        max-width: none;
+        height: 217px; /* el PNG es 315 × 218: sin esto la caja sale de 252,3 */
+        padding: calc((252px - 217px) / 2) calc((362px - 314px) / 2);
+      }
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -58,13 +151,21 @@
   <header></header>
   <main class="error">
     <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
-        <text x="0" y="17">404</text>
-      </svg>
-      <h2 class="error-message">Page Not Found</h2>
-      <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
+      <img class="error-illustration" src="/images/404-goal.png" alt="" width="314" height="217">
+      <p class="error-eyebrow">Error 404</p>
+      <h1 class="error-title" data-en="Oops! Hit the post">¡Uy! Al palo</h1>
+      <p class="error-text" data-en="This page went just wide: the link may have changed or no longer exists. No worries, the game is still on.">Esta página se nos ha ido fuera por muy poco: puede que el enlace haya cambiado o que ya no exista. No pasa nada, el partido sigue en juego.</p>
+      <p class="button-container error-actions">
+        <a href="/" data-en-href="/en/" data-en="Back to home" class="btn btn--primary">Volver al inicio</a>
+        <a href="/#experiencias" data-en-href="/en/#experiences" data-en="See experiences" class="btn btn--secondary">Ver experiencias</a>
       </p>
+      <p class="error-shortcuts-label" data-en="Looking for something?">¿Buscabas algo en concreto?</p>
+      <ul class="error-shortcuts">
+        <li><a href="/#experiencias" data-en-href="/en/#experiences" data-en="Experiences">Experiencias</a></li>
+        <li><a href="/#entradas" data-en-href="/en/#tickets" data-en="Tickets">Entradas</a></li>
+        <li><a href="/#noticias" data-en-href="/en/#news" data-en="News">Noticias</a></li>
+        <li><a href="/#faq" data-en-href="/en/#faq" data-en="FAQ">Preguntas frecuentes</a></li>
+      </ul>
     </div>
   </main>
   <footer></footer>

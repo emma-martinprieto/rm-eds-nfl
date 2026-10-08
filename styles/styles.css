@@ -59,9 +59,10 @@
   --color-text-inverse-subtle:  rgba(255, 255, 255, 0.45);
 
   /* ─── Gradients ──────────────────────────────────────── */
-  --gradient-btn-primary:     linear-gradient(4deg, #3E31FA 19%, #8760F6 94%);
-  --gradient-premium:         linear-gradient(135deg, #E4D0AB 0%, #F3F6F9 100%);
+  --gradient-btn-primary:     linear-gradient(1.586deg, #3E31FA 20.955%, #8760F6 91.225%);
+  --gradient-premium:         linear-gradient(90deg, #E4D0AB, #F3F6F9);
   --gradient-platinum:        linear-gradient(135deg, #636682 0%, #BDBECC 50%, #A8AABD 100%);
+  --gradient-platinum-surface: linear-gradient(170.54deg, #BDBECC 14.645%, #A8AABD 85.355%);
   --gradient-card-dark:       linear-gradient(155deg, #14142B 0%, #0A0A0A 100%); /* fondo dark de cards (flip card, etc.) — reemplaza el navy inventado por el agente */
 
   /* ─── Spacing · base ×8 ──────────────────────────────── */
@@ -86,7 +87,7 @@
   --radius-pill:              9999px;
 
   /* ─── Typography (RM Neue, responsive con clamp) ─────── */
-  /* RM Neue: no font file exists (user decision 2). Kept literally; resolves to sans-serif. */
+  /* RM Neue: /fonts/rm-neue-{regular,semibold,bold}.woff2, @font-face in styles/fonts.css */
   --font-family:              'RM Neue', sans-serif;
 
   /* Display — Bold */
@@ -210,6 +211,7 @@
   --lh-heading:         1.2;
   --lh-body:            1.65;   /* tokens.css · body */
   --lh-small:           1.6;    /* tokens.css · small */
+  --lh-caption:         1.5;    /* etiquetas (badge) */
   --tracking-display:   0.01em; /* ajustado a la display condensada (tokens.css daba -1px para RM Neue) */
   --tracking-caps:      0.08em; /* eyebrows y etiquetas en mayúsculas */
   --font-weight-bold:   700;
@@ -222,8 +224,17 @@
   --media-ratio:        3 / 2;
   --blur-arrow:         12px;   /* desenfoque de fondo del «Row Arrow» (Figma) */
   --text-title-sm:      28px;
-  --flip-duration:      0.6s;   /* giro de las tarjetas de noticias (sin token de duración) */
-  --reveal-duration:    0.6s;   /* aparición en cascada de Experiencias (sin token de duración) */
+  --text-title-xs:      24px;   /* títulos de las tarjetas de noticias (sin token de texto) */
+  --reveal-duration:    0.6s;   /* aparición en cascada: Experiencias, Planes, Noticias (sin token de duración) */
+  --news-card-max:      400px;  /* ancho de las tarjetas de noticias en desktop (Figma 1440) */
+  --news-ratio:         16 / 9; /* foto de la noticia en el lightbox y en su página */
+  --lightbox-width:     720px;  /* panel del lightbox de noticias en web y tablet */
+  --lightbox-max-height: 90vh;  /* alto máximo del panel; si la noticia es más larga, scroll dentro */
+  --lightbox-backdrop:  72%;    /* fondo oscurecido detrás del lightbox (--color-bg-dark) */
+  --lightbox-in:        0.3s;   /* abrir el lightbox: fondo y panel (sin token de duración) */
+  --lightbox-out:       0.2s;   /* cerrar el lightbox */
+  /* PROPUESTO, pendiente de validar por diseño (README · Valores propuestos) */
+  --shadow-dialog:      0 var(--spacing-md) var(--spacing-2xl) color-mix(in srgb, var(--color-bg-dark) 40%, transparent);
   --final-cta-btn-width: 12em;  /* los dos botones del CTA final, en bloques distintos, igual de anchos */
   --xp-hint-alpha:      50%;    /* «¿No eres Premium?»: gris más sutil que -muted; 5,3:1 sobre la tarjeta (AA) */
   --hover-duration:     0.4s;   /* zoom de foto y sombra de planes al pasar el ratón (sin token de duración) */
@@ -234,6 +245,18 @@
   --hospitality-helmet-max: 152px; /* tamaño de los cascos en el Figma de escritorio */
   --hospitality-helmet: clamp(88px, 10vw, var(--hospitality-helmet-max)); /* cascos que sobresalen del banner Hospitality */
   --hospitality-min-height: 360px; /* alto mínimo del banner Hospitality en escritorio */
+
+  /* 00 · Header · menú (nfl-header-menu/LEEME.md) */
+  --menu-duration:      0.8s;   /* entrada y salida del panel del menú y del fondo (sin token de duración) */
+  --menu-ease:          cubic-bezier(0.76, 0, 0.24, 1); /* curva del panel del menú */
+  --menu-max-width:     640px;  /* ancho máximo del panel del menú en tablet */
+  --menu-curve:         100px;  /* ancho del borde curvo del panel al entrar */
+  --burger-line:        2px;    /* grosor de las rayas de la hamburguesa y del subrayado activo */
+  --header-offset:      88px;   /* alto de la cabecera compacta: margen de las anclas */
+  --header-scrim:       45%;    /* degradado de la cabecera sobre el hero */
+  --header-scrim-strong: 88%;   /* degradado de la cabecera al bajar: arriba… */
+  --header-scrim-mid:   72%;    /* …y a media altura (después se funde) */
+  --menu-backdrop:      56%;    /* fondo oscurecido detrás del panel del menú */
 }
 
 
@@ -391,6 +414,11 @@ main > .section {
   padding-block: var(--section-padding);
 }
 
+/* Anclas del menú (section-metadata `Id`): la cabecera fija no tapa el inicio */
+main > .section[id] {
+  scroll-margin-top: var(--header-offset);
+}
+
 /* Empty sections (e.g. the one that held the page `metadata` table, which EDS
    moves to <head>) would otherwise render as a blank band of 2 × padding */
 main > .section:not(:has(> *)) {
@@ -543,7 +571,7 @@ main > .section.split > .default-content-wrapper {
   position: absolute;
   top: var(--spacing-xs);
   left: var(--spacing-xs);
-  z-index: 10;
+  z-index: 30; /* por encima de la cabecera fija (10) y del menú abierto (20) */
   padding: var(--spacing-xs) var(--spacing-base);
   border-radius: var(--radius-sm);
   background-color: var(--color-bg-light);
@@ -603,9 +631,12 @@ main > .section.split > .default-content-wrapper {
   background: var(--btn-primary-bg-pressed);
 }
 
-/* Desactivado (p. ej. «Agotado»): tokens --btn-disabled-* */
+/* Desactivado (p. ej. «Agotado», o un CTA de experiencias sin enlace en DA):
+   tokens --btn-disabled-* */
 .btn:disabled,
-.btn:disabled:hover {
+.btn:disabled:hover,
+.btn[aria-disabled="true"],
+.btn[aria-disabled="true"]:hover {
   background: var(--btn-disabled-bg);
   color: var(--btn-disabled-text);
   box-shadow: none;
@@ -674,6 +705,65 @@ main > .section.split > .default-content-wrapper {
   height: var(--spacing-md);
 }
 
+/* ─── Carrusel horizontal (scripts/row-carousel.js) ─────
+   Planes y Noticias. El track sale hasta los bordes del contenedor (márgenes
+   de la retícula) para que asome la siguiente tarjeta; las tarjetas encajan al
+   inicio del contenido. Sin barra: las flechas y la tarjeta que asoma ya indican
+   que hay más. Región enfocable: se desplaza con las flechas del teclado.
+   El ancho de las tarjetas lo pone cada bloque. */
+.row-carousel {
+  position: relative;
+}
+
+.row-carousel > .row-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.row-carousel > .row-arrow--prev {
+  left: calc(var(--layout-margin) * -1 + var(--spacing-xs));
+}
+
+.row-carousel > .row-arrow--next {
+  right: calc(var(--layout-margin) * -1 + var(--spacing-xs));
+}
+
+/* position: relative → lo absoluto de dentro (p. ej. el texto oculto .visually-hidden de
+   «Leer más») se recorta con el track; si no, se posiciona respecto a .row-carousel y las
+   tarjetas de fuera de la vista ensanchan la página. */
+.row-carousel__track {
+  position: relative;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--layout-margin);
+  scrollbar-width: none;
+  margin-inline: calc(var(--layout-margin) * -1);
+  padding-inline: var(--layout-margin);
+}
+
+.row-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* track > lista > tarjetas */
+.row-carousel__track > * > * {
+  scroll-snap-align: start;
+}
+
+/* Arrastrar con el ratón */
+.row-carousel__track.is-draggable {
+  cursor: grab;
+}
+
+.row-carousel__track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
 /* ─── Etiqueta de nivel ──────────────────────────────── */
 .badge {
   display: inline-block;
@@ -683,18 +773,20 @@ main > .section.split > .default-content-wrapper {
   font-size: var(--text-caption);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-caps);
-  line-height: var(--lh-heading);
+  line-height: var(--lh-caption);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
+/* Figma: verde «todos los madridistas», dorada Premium, plateada Platinum */
 .badge--free {
   background-color: var(--color-success-light);
   color: var(--color-success-dark);
 }
 
 .badge--premium {
-  background-color: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  background: var(--gradient-premium);
+  color: var(--color-off-black);
 }
 
 .badge--tbc {
@@ -704,8 +796,25 @@ main > .section.split > .default-content-wrapper {
 
 .badge--platinum,
 .badge--vip {
-  background: var(--platinum-surface);
+  background: var(--gradient-platinum-surface);
   color: var(--color-off-black);
+}
+
+/* ─── Aparición en cascada (scripts/reveal.js) ───────── */
+/* Experiencias, Planes y Noticias. Las clases las pone y las quita el JS
+   (sin JS, o con movimiento reducido, todo se ve desde el principio).
+   main: especificidad (0,1,1), para ganar a la opacidad de estados como .xp-row--past */
+main .reveal {
+  opacity: 0;
+  transform: translateY(var(--spacing-md));
+  transition:
+    opacity var(--reveal-duration) ease var(--reveal-delay, 0s),
+    transform var(--reveal-duration) ease var(--reveal-delay, 0s);
+}
+
+main .reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
 
 /* ─── Encabezado de sección (hooks set by block JS) ──── */

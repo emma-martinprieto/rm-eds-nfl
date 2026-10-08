@@ -1,4 +1,5 @@
 import { plainImg, toButton, ensureId } from '../../scripts/nfl-utils.js';
+import { loadPlaceholders } from '../../scripts/placeholders.js';
 
 /* 10 · CTA final — prototype index.html L464-478. The block element plays section.final-cta.
    Behaviour = js/script.js L451-569 (balón que aterriza en el césped). */
@@ -147,7 +148,8 @@ function textP(p, className) {
   return el;
 }
 
-export default function decorate(block) {
+export default async function decorate(block) {
+  await loadPlaceholders(); // toButton: «se abre en una pestaña nueva» en el idioma de la página
   const [bgRow, mainRow, secondaryRow] = [...block.children];
 
   const bgImg = bgRow && bgRow.querySelector('img');

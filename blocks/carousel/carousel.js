@@ -1,9 +1,15 @@
 import { toButton } from '../../scripts/nfl-utils.js';
 import { icon } from '../../scripts/nfl-icons.js';
+import initReveal from '../../scripts/reveal.js';
+import initRowCarousel, { rowArrow } from '../../scripts/row-carousel.js';
+import { loadPlaceholders, t } from '../../scripts/placeholders.js';
 
 /* 06 · Planes Madridista (variant `planes`) — prototype index.html L237-289.
-   Behaviour = js/script.js L330-413 (carrusel <1024, 3 columnas ≥1024).
-   This is the only carousel of the site; the boilerplate slide carousel is not used. */
+   Behaviour = js/script.js L330-413 (carrusel <1024, 4 columnas ≥1024).
+   Rows in the order shown at every size (Platinum, Premium, Junior, Free).
+   data-plan on each card: used by scripts/campaign-params.js. */
+
+const DESKTOP = window.matchMedia('(min-width: 1024px)'); // --breakpoint-desktop
 
 function buildPrice(p) {
   const price = document.createElement('p');
@@ -85,128 +91,38 @@ function buildPlan(row) {
   return li;
 }
 
-function arrow(dir) {
-  const btn = document.createElement('button');
-  btn.className = `row-arrow row-arrow--${dir}`;
-  btn.type = 'button';
-  btn.setAttribute('aria-controls', 'planes');
-  btn.hidden = true;
-  const label = document.createElement('span');
-  label.className = 'visually-hidden';
-  label.textContent = dir === 'prev' ? 'Plan anterior' : 'Plan siguiente';
-  btn.append(icon(dir === 'prev' ? 'chevron-left' : 'chevron-right', 'row-arrow__icon'), label);
-  return btn;
-}
+export default async function decorate(block) {
+  if (!block.classList.contains('planes')) return;
+  await loadPlaceholders();
 
-/* ─── Carrusel — script.js L330-413 ─── */
-function initSlider(slider) {
-  const track = slider.querySelector('.membership__carousel');
-  const prev = slider.querySelector('.row-arrow--prev');
-  const next = slider.querySelector('.row-arrow--next');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  function step() {
-    const card = track.querySelector('.plan');
-    const gap = parseFloat(getComputedStyle(track.querySelector('.membership__plans')).columnGap) || 0;
-    return card ? card.getBoundingClientRect().width + gap : track.clientWidth;
-  }
-
-  function update() {
-    const max = track.scrollWidth - track.clientWidth;
-    const scrollable = max > 1;
-    track.classList.toggle('is-draggable', scrollable);
-    prev.hidden = !scrollable || track.scrollLeft <= 1;
-    next.hidden = !scrollable || track.scrollLeft >= max - 1;
-  }
-
-  function go(dir) {
-    track.scrollBy({ left: dir * step(), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-    setTimeout(update, 500); // por si el navegador no emite «scroll» al terminar
-  }
-
-  prev.addEventListener('click', () => { go(-1); });
-  next.addEventListener('click', () => { go(1); });
-  track.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-
-  // Arrastre con ratón
-  let startX = 0;
-  let startScroll = 0;
-  let dragging = false;
-  let moved = false;
-  let suppressClick = false;
-
-  track.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse' || e.button !== 0 || !track.classList.contains('is-draggable')) return;
-    dragging = true;
-    moved = false;
-    startX = e.clientX;
-    startScroll = track.scrollLeft;
-  });
-
-  window.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    if (!moved && Math.abs(dx) > 5) {
-      moved = true;
-      track.classList.add('is-dragging');
-    }
-    if (moved) track.scrollLeft = startScroll - dx;
-  });
-
-  window.addEventListener('pointerup', (e) => {
-    if (!dragging) return;
-    dragging = false;
-    if (!moved) return;
-    // Al soltar: con más de 50 px de arrastre pasa a la tarjeta siguiente/anterior
-    const size = step();
-    const from = Math.round(startScroll / size);
-    const dx = e.clientX - startX;
-    let index = from;
-    if (Math.abs(dx) > 50) index = from + (dx < 0 ? 1 : -1);
-    track.classList.remove('is-dragging');
-    track.scrollTo({ left: index * size, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-    setTimeout(update, 500);
-    // Bloquea solo el clic que el navegador dispara justo al soltar
-    suppressClick = true;
-    setTimeout(() => { suppressClick = false; }, 0);
-  });
-
-  // Evita el «arrastrar enlace» nativo del navegador sobre los botones
-  track.addEventListener('dragstart', (e) => { e.preventDefault(); });
-
-  // Tras un arrastre, que el clic no active un botón de la tarjeta
-  track.addEventListener('click', (e) => {
-    if (suppressClick) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
-
-  update();
-  // EDS: the section is display:none while blocks decorate, so the first update() measures 0;
-  // re-measure when the track gets its real size (no visible change vs. the prototype).
-  if ('ResizeObserver' in window) new ResizeObserver(update).observe(track);
-}
-
-export default function decorate(block) {
   const plans = document.createElement('ul');
   plans.className = 'membership__plans';
   plans.setAttribute('role', 'list');
   [...block.children].forEach((row) => plans.append(buildPlan(row)));
 
   const track = document.createElement('div');
-  track.className = 'membership__carousel';
+  track.className = 'membership__carousel row-carousel__track';
   track.id = 'planes';
   track.setAttribute('role', 'region');
-  track.setAttribute('aria-label', 'Planes Madridista');
+  track.setAttribute('aria-label', t('plans-region', 'Planes Madridista'));
   track.tabIndex = 0;
   track.append(plans);
 
+  // Carrusel <1024 (scripts/row-carousel.js); en desktop, 4 columnas sin scroll
+  const prev = rowArrow('prev', t('plans-prev', 'Plan anterior'), track.id);
+  const next = rowArrow('next', t('plans-next', 'Plan siguiente'), track.id);
   const slider = document.createElement('div');
-  slider.className = 'membership__slider';
-  slider.append(arrow('prev'), track, arrow('next'));
+  slider.className = 'membership__slider row-carousel';
+  slider.append(prev, track, next);
 
   block.replaceChildren(slider);
-  initSlider(slider);
+  initRowCarousel({
+    track, list: plans, prev, next, layout: DESKTOP,
+  });
+
+  // Cascada: título y, en desktop, cada tarjeta (en el orden en que se ven).
+  // En móvil y tablet, el carrusel entero de una vez: la tarjeta que asoma no queda invisible.
+  const section = block.closest('.section');
+  const heads = section ? [...section.querySelectorAll(':scope > .default-content-wrapper')] : [];
+  initReveal(() => [...heads, ...(DESKTOP.matches ? plans.children : [slider])], DESKTOP);
 }
