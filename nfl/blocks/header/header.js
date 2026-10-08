@@ -2,7 +2,7 @@ import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { plainImg } from '../../scripts/nfl-utils.js';
 import {
-  SITE_ROOT, homePath, isHomePage, languagePaths, localize, normalizePath, t,
+  SITE_ROOT, homePath, isHomePage, languagePaths, localePath, localize, normalizePath, t,
 } from '../../scripts/placeholders.js';
 
 /* 00 · Header — _referencias/nfl-header-menu (LEEME.md, index.html, script.js).
@@ -73,7 +73,8 @@ function buildLang(list) {
   [...list.querySelectorAll('a')].forEach((a) => {
     const code = a.textContent.trim();
     const iso = code.toLowerCase();
-    const href = equivalents[iso] || toHref(a);
+    // En la portada, el enlace del nav; si es ES/EN, con el idioma una sola vez (en/ → /nfl/en/)
+    const href = equivalents[iso] || (LANG_NAMES[iso] ? localePath(toHref(a), iso) : toHref(a));
     const item = document.createElement('a');
     item.className = 'lang-switch__item';
     item.href = href;

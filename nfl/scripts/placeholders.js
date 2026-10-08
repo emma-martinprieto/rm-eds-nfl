@@ -29,6 +29,32 @@ export function homePath(lang = pageLanguage()) {
   return lang === 'en' ? `${SITE_ROOT}/en/` : `${SITE_ROOT}/`;
 }
 
+/**
+ * Ruta absoluta de la landing en un idioma: /nfl y el prefijo /en una sola vez, venga la
+ * ruta como venga (en/news/x, /en/news/x, /nfl/en/news/x, news/x → /nfl/en/news/x).
+ * Las rutas relativas se toman desde la raíz de la landing, no desde la página (en/news/x
+ * en /nfl/en/ no es /nfl/en/en/news/x). Anclas y enlaces a otro dominio, sin cambios.
+ * @param {string} href ruta o URL del contenido
+ * @param {'es'|'en'} [lang] idioma de destino (por defecto, el de la página)
+ * @returns {string}
+ */
+export function localePath(href, lang = pageLanguage()) {
+  if (!href || href.startsWith('#')) return href;
+  let url;
+  try {
+    url = new URL(href, `${window.location.origin}/`);
+  } catch (e) {
+    return href;
+  }
+  if (url.origin !== window.location.origin) return href;
+  const rest = url.pathname
+    .replace(/\/{2,}/g, '/') // /nfl//en/ (barra de más en DA)
+    .replace(new RegExp(`^${SITE_ROOT}(?=/|$)`), '')
+    .replace(/^\/en(?=\/|$)/, '') || '/';
+  const prefix = lang === 'en' ? `${SITE_ROOT}/en` : SITE_ROOT;
+  return `${prefix}${rest}${url.search}${url.hash}`;
+}
+
 /** ¿Es la portada de su idioma? (las anclas del menú solo existen ahí) */
 export function isHomePage() {
   return normalizePath(window.location.pathname) === normalizePath(homePath());
@@ -46,7 +72,7 @@ export function languagePaths() {
   const isEn = pageLanguage() === 'en';
   let alternate = getMetadata('alternate-path').trim();
   try {
-    alternate = alternate ? new URL(alternate, origin).pathname : '';
+    alternate = alternate ? new URL(localePath(alternate, isEn ? 'es' : 'en'), origin).pathname : '';
   } catch (e) {
     alternate = '';
   }

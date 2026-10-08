@@ -4,7 +4,7 @@ import { icon } from '../../scripts/nfl-icons.js';
 import initReveal from '../../scripts/reveal.js';
 import initRowCarousel, { rowArrow } from '../../scripts/row-carousel.js';
 import initNewsLightbox from '../../scripts/news-lightbox.js';
-import { loadPlaceholders, t } from '../../scripts/placeholders.js';
+import { loadPlaceholders, localePath, t } from '../../scripts/placeholders.js';
 
 /* ─── Variant `news` · 08 · Noticias ───
    Carrusel horizontal de tarjetas (scripts/row-carousel.js, también en desktop) y
@@ -49,12 +49,13 @@ function buildNewsCard(row) {
   }
   if (teaserP) li.append(textP('news-card__teaser', teaserP.textContent.trim()));
 
-  // «Leer más ›»: enlace real a la página de la noticia (el lightbox lo intercepta)
+  // «Leer más ›»: enlace real a la página de la noticia (el lightbox lo intercepta).
+  // localePath: en DA la ruta puede venir relativa (en/news/x) o sin /nfl
   const a = (linkCell && linkCell.querySelector('a')) || (textCell && textCell.querySelector('a'));
   if (a && a.getAttribute('href')) {
     const more = document.createElement('a');
     more.className = 'news-card__more';
-    more.href = a.getAttribute('href');
+    more.href = localePath(a.getAttribute('href'));
     if (category) more.dataset.category = category;
     const hidden = document.createElement('span');
     hidden.className = 'visually-hidden';
