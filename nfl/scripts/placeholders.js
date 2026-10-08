@@ -1,28 +1,32 @@
 /*
  * Textos de interfaz por idioma — hojas `placeholders` de DA (columnas Key y Text):
- * /placeholders (español) y /en/placeholders (inglés).
+ * /nfl/placeholders (español) y /nfl/en/placeholders (inglés).
  * fetchPlaceholders is the boilerplate implementation (no longer shipped in aem.js).
  */
 import { getMetadata, toCamelCase } from './aem.js';
 
+/** Carpeta de la landing: la portada española es /nfl/ y la inglesa /nfl/en/. */
+export const SITE_ROOT = '/nfl';
+
 const LOCALES = { es: 'es-ES', en: 'en-GB' };
+const EN_PREFIX = new RegExp(`^${SITE_ROOT}/en(/|$)`);
 
 /**
- * Idioma de la página: `en` bajo /en/; si no, `es`.
+ * Idioma de la página: `en` bajo /nfl/en/; si no, `es`.
  * @returns {'es'|'en'}
  */
 export function pageLanguage() {
-  return /^\/en(\/|$)/.test(window.location.pathname) ? 'en' : 'es';
+  return EN_PREFIX.test(window.location.pathname) ? 'en' : 'es';
 }
 
-/** Ruta comparable: sin barra final ni index (/en/ = /en, /index = /). */
+/** Ruta comparable: sin barra final ni index (/nfl/en/ = /nfl/en, /nfl/index = /nfl). */
 export function normalizePath(path) {
   return path.replace(/\/(index(\.html)?)?$/, '') || '/';
 }
 
-/** Portada del idioma: / o /en/. */
+/** Portada del idioma: /nfl/ o /nfl/en/. */
 export function homePath(lang = pageLanguage()) {
-  return lang === 'en' ? '/en/' : '/';
+  return lang === 'en' ? `${SITE_ROOT}/en/` : `${SITE_ROOT}/`;
 }
 
 /** ¿Es la portada de su idioma? (las anclas del menú solo existen ahí) */
@@ -34,7 +38,7 @@ export function isHomePage() {
  * Esta página en español y en inglés (hreflang y selector de idioma).
  * La otra versión: el metadato `Alternate Path` (ruta equivalente en el otro idioma, para
  * páginas cuya ruta no es igual en los dos, como las noticias); si no está, se calcula
- * cambiando solo el prefijo: /x ↔ /en/x (la portada: / ↔ /en/).
+ * cambiando solo el prefijo: /nfl/x ↔ /nfl/en/x (la portada: /nfl/ ↔ /nfl/en/).
  * @returns {{es: string, en: string}}
  */
 export function languagePaths() {
@@ -46,10 +50,12 @@ export function languagePaths() {
   } catch (e) {
     alternate = '';
   }
-  const autoEs = pathname.replace(/^\/en(\/|$)/, '/');
+  const autoEs = pathname.replace(EN_PREFIX, `${SITE_ROOT}/`);
+  // Ruta dentro de la landing (/x de /nfl/x), para ponerle delante /nfl/en
+  const rest = autoEs.startsWith(`${SITE_ROOT}/`) ? autoEs.slice(SITE_ROOT.length) : autoEs;
   return {
     es: (isEn && alternate) || (isEn ? autoEs : pathname),
-    en: (!isEn && alternate) || (isEn ? pathname : `/en${autoEs}`),
+    en: (!isEn && alternate) || (isEn ? pathname : `${SITE_ROOT}/en${rest}`),
   };
 }
 
@@ -106,7 +112,7 @@ let loaded = false;
  * @returns {Promise<object>}
  */
 export async function loadPlaceholders() {
-  dictionary = await fetchPlaceholders(pageLanguage() === 'en' ? '/en' : 'default');
+  dictionary = await fetchPlaceholders(pageLanguage() === 'en' ? `${SITE_ROOT}/en` : SITE_ROOT);
   loaded = true;
   return dictionary;
 }

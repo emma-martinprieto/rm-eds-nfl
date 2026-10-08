@@ -2,7 +2,7 @@ import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { plainImg } from '../../scripts/nfl-utils.js';
 import {
-  homePath, isHomePage, languagePaths, localize, normalizePath, t,
+  SITE_ROOT, homePath, isHomePage, languagePaths, localize, normalizePath, t,
 } from '../../scripts/placeholders.js';
 
 /* 00 · Header — _referencias/nfl-header-menu (LEEME.md, index.html, script.js).
@@ -22,16 +22,18 @@ const SCROLLED_AT = 8; // px: from here on the header compacts
 const SCROLL_DELTA = 4; // px: ignore tiny scroll jitter before hiding/showing
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+/** Metadato Nav; si no, el nav del idioma: /nfl/nav o /nfl/en/nav (borradores: /nfl/drafts/nav). */
 function navPath() {
   const navMeta = getMetadata('nav');
   if (navMeta) return new URL(navMeta, window.location).pathname;
-  return window.location.pathname.startsWith('/drafts/') ? '/drafts/nav' : '/nav';
+  const drafts = `${SITE_ROOT}/drafts/`;
+  return window.location.pathname.startsWith(drafts) ? `${drafts}nav` : `${homePath()}nav`;
 }
 
 /**
  * Authored anchors may come back as full URLs (https://…/#faq): keep just the hash
  * when they point to this page. Fuera de la portada (p. ej. una noticia), las anclas
- * (#experiencias) llevan a la portada de su idioma: /#experiencias, /en/#experiences.
+ * (#experiencias) llevan a la portada de su idioma: /nfl/#experiencias, /nfl/en/#experiences.
  * @param {HTMLAnchorElement} a authored link
  * @returns {string} href
  */
@@ -65,7 +67,7 @@ function buildLang(list) {
   localize(() => lang.setAttribute('aria-label', t('header-language', 'Idioma')));
   const pageLang = (document.documentElement.lang || 'es').toLowerCase();
   // Fuera de la portada, ES/EN llevan a esta misma página en el otro idioma
-  // (metadato Alternate Path o cálculo con /en/, como el hreflang)
+  // (metadato Alternate Path o cálculo con /nfl/en/, como el hreflang)
   const equivalents = isHomePage() ? {} : languagePaths();
   const items = [];
   [...list.querySelectorAll('a')].forEach((a) => {

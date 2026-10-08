@@ -3,5 +3,5 @@ Please always provide the [GitHub issue(s)](../issues) your PR is for, as well a
 Fix #<gh-issue-id>
 
 Test URLs:
-- Before: https://main--nfl-hub--eds-realmadrid.aem.live/
-- After: https://<branch>--nfl-hub--eds-realmadrid.aem.live/
+- Before: https://main--nfl-hub--eds-realmadrid.aem.live/nfl/
+- After: https://<branch>--nfl-hub--eds-realmadrid.aem.live/nfl/

@@ -1,7 +1,9 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { plainImg, cleanLink } from '../../scripts/nfl-utils.js';
-import { loadPlaceholders, t } from '../../scripts/placeholders.js';
+import {
+  SITE_ROOT, homePath, loadPlaceholders, t,
+} from '../../scripts/placeholders.js';
 
 /* 11 · Footer — prototype index.html L483-508 (3 logos + nav institucional + legal). */
 
@@ -15,10 +17,12 @@ const NAV_LABELS = [
 ];
 const NAV_CLASSES = ['site-footer__nav', 'site-footer__legal'];
 
+/** Metadato Footer; si no, el del idioma: /nfl/footer o /nfl/en/footer (o /nfl/drafts/footer). */
 function footerPath() {
   const footerMeta = getMetadata('footer');
   if (footerMeta) return new URL(footerMeta, window.location).pathname;
-  return window.location.pathname.startsWith('/drafts/') ? '/drafts/footer' : '/footer';
+  const drafts = `${SITE_ROOT}/drafts/`;
+  return window.location.pathname.startsWith(drafts) ? `${drafts}footer` : `${homePath()}footer`;
 }
 
 /**

@@ -220,7 +220,7 @@ async function loadScrollBall() {
 
 /**
  * <link rel="alternate" hreflang> entre la versión española y la inglesa de la página
- * (languagePaths: metadato Alternate Path o cálculo con /en/). x-default apunta a la
+ * (languagePaths: metadato Alternate Path o cálculo con /nfl/en/). x-default apunta a la
  * española. URLs absolutas, sin query ni hash.
  */
 function addHreflangLinks() {

@@ -10,7 +10,7 @@
  */
 import { loadCSS } from './aem.js';
 import { timeEl, ensureId, externalize } from './nfl-utils.js';
-import { localize, pageLanguage, t } from './placeholders.js';
+import { homePath, localize, t } from './placeholders.js';
 
 export function loadArticleStyles() {
   return loadCSS(`${window.hlx.codeBasePath}/styles/news-article.css`);
@@ -137,7 +137,7 @@ export function addBackLink(main) {
   const p = document.createElement('p');
   p.className = 'news-article__back';
   const a = document.createElement('a');
-  a.href = pageLanguage() === 'en' ? '/en/' : '/';
+  a.href = homePath();
   localize(() => { a.textContent = t('news-page-back', 'Volver al NFL Madrid Game'); });
   p.append(a);
   wrapper.append(p);

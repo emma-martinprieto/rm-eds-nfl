@@ -64,7 +64,7 @@ function buildCalButton(cfg, target) {
   if (!cal.hasAttribute('data-ics-start') && target) cal.setAttribute('data-ics-start', target);
   // iPhone: .ics publicado (Safari solo ofrece «Añadir al calendario» con un archivo real).
   // Fila opcional «ICS File»; si no, el del repo. Sus datos deben coincidir con las filas ICS.
-  // Por defecto, el del idioma de la página (/en/ → nfl-madrid-game-en.ics)
+  // Por defecto, el del idioma de la página (/nfl/en/ → nfl-madrid-game-en.ics)
   const icsFile = `nfl-madrid-game${pageLanguage() === 'en' ? '-en' : ''}.ics`;
   cal.setAttribute('data-ics-file', cfg['ics-file'] || `${window.hlx.codeBasePath}/calendar/${icsFile}`);
   if (cfg['ics-allday']) cal.setAttribute('data-ics-allday', '');

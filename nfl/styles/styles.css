@@ -87,7 +87,7 @@
   --radius-pill:              9999px;
 
   /* ─── Typography (RM Neue, responsive con clamp) ─────── */
-  /* RM Neue: /fonts/rm-neue-{regular,semibold,bold}.woff2, @font-face in styles/fonts.css */
+  /* RM Neue: /nfl/fonts/rm-neue-{regular,semibold,bold}.woff2, @font-face in styles/fonts.css */
   --font-family:              'RM Neue', sans-serif;
 
   /* Display — Bold */
@@ -191,14 +191,14 @@
 
 
 /* ─── Tipografía de títulos · Bernabéu ───────────────── */
-/* styles.css L13-20. Only font file re-hosted (user decision): /fonts/bernabeu-black.woff2 */
+/* styles.css L13-20. Only font file re-hosted (user decision): /nfl/fonts/bernabeu-black.woff2 */
 @font-face {
   font-family: 'Bernabeu';
   font-style: normal;
   font-weight: 700 900; /* un solo archivo Black: sirve también para bold, sin negrita sintética */
   font-display: swap;
   src: local('Bernabeu Black'), local('Bernabeu-Black'),
-       url('/fonts/bernabeu-black.woff2') format('woff2');
+       url('../fonts/bernabeu-black.woff2') format('woff2');
 }
 
 :root {

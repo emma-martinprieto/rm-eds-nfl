@@ -16,7 +16,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:title" content="Página no encontrada · NFL Madrid Game 2026">
   <script nonce="aem" type="module">
-    if (/(^|\/)en(\/|$)/.test(window.location.pathname)) {
+    if (/^\/nfl\/en(\/|$)/.test(window.location.pathname)) {
       document.documentElement.lang = 'en';
       document.title = 'Page not found · NFL Madrid Game 2026';
       document.querySelectorAll('main.error [data-en]').forEach((el) => {
@@ -27,12 +27,12 @@
       });
     }
   </script>
-  <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
+  <script nonce="aem" src="/nfl/scripts/scripts.js" type="module"></script>
   <script nonce="aem" type="module">
-    import { sampleRUM } from '/scripts/aem.js';
+    import { sampleRUM } from '/nfl/scripts/aem.js';
     sampleRUM('404', { source: document.referrer });
   </script>
-  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/nfl/styles/styles.css">
   <style>
     /* Cabecera en negro sólido, como en la página de una noticia */
     body header.site-header {
@@ -144,27 +144,27 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/styles/lazy-styles.css">
+  <link rel="stylesheet" href="/nfl/styles/lazy-styles.css">
 </head>
 
 <body>
   <header></header>
   <main class="error">
     <div class="section">
-      <img class="error-illustration" src="/images/404-goal.png" alt="" width="314" height="217">
+      <img class="error-illustration" src="/nfl/images/404-goal.png" alt="" width="314" height="217">
       <p class="error-eyebrow">Error 404</p>
       <h1 class="error-title" data-en="Oops! Hit the post">¡Uy! Al palo</h1>
       <p class="error-text" data-en="This page went just wide: the link may have changed or no longer exists. No worries, the game is still on.">Esta página se nos ha ido fuera por muy poco: puede que el enlace haya cambiado o que ya no exista. No pasa nada, el partido sigue en juego.</p>
       <p class="button-container error-actions">
-        <a href="/" data-en-href="/en/" data-en="Back to home" class="btn btn--primary">Volver al inicio</a>
-        <a href="/#experiencias" data-en-href="/en/#experiences" data-en="See experiences" class="btn btn--secondary">Ver experiencias</a>
+        <a href="/nfl/" data-en-href="/nfl/en/" data-en="Back to home" class="btn btn--primary">Volver al inicio</a>
+        <a href="/nfl/#experiencias" data-en-href="/nfl/en/#experiences" data-en="See experiences" class="btn btn--secondary">Ver experiencias</a>
       </p>
       <p class="error-shortcuts-label" data-en="Looking for something?">¿Buscabas algo en concreto?</p>
       <ul class="error-shortcuts">
-        <li><a href="/#experiencias" data-en-href="/en/#experiences" data-en="Experiences">Experiencias</a></li>
-        <li><a href="/#entradas" data-en-href="/en/#tickets" data-en="Tickets">Entradas</a></li>
-        <li><a href="/#noticias" data-en-href="/en/#news" data-en="News">Noticias</a></li>
-        <li><a href="/#faq" data-en-href="/en/#faq" data-en="FAQ">Preguntas frecuentes</a></li>
+        <li><a href="/nfl/#experiencias" data-en-href="/nfl/en/#experiences" data-en="Experiences">Experiencias</a></li>
+        <li><a href="/nfl/#entradas" data-en-href="/nfl/en/#tickets" data-en="Tickets">Entradas</a></li>
+        <li><a href="/nfl/#noticias" data-en-href="/nfl/en/#news" data-en="News">Noticias</a></li>
+        <li><a href="/nfl/#faq" data-en-href="/nfl/en/#faq" data-en="FAQ">Preguntas frecuentes</a></li>
       </ul>
     </div>
   </main>
